@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coastal Protection - Registration</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/register.css">
+    
+</head>
+<body>
+    <!-- Floating Elements -->
+    <div class="floating-elements">
+        <div class="floating-element"></div>
+        <div class="floating-element"></div>
+        <div class="floating-element"></div>
+        <div class="floating-element"></div>
+        <div class="floating-element"></div>
+    </div>
+
+    <!-- Registration Container -->
+    <div class="registration-container">
+        <!-- Header -->
+        <div class="registration-header">
+            <div class="logo">Coastal Protection</div>
+            <div class="registration-badge">Join the Movement</div>
+            <h1 class="registration-title">Create Your Account</h1>
+            <p class="registration-subtitle">Help protect our coastal ecosystems through Web3 technology</p>
+        </div>
+
+        <!-- Registration Form -->
+        <form class="registration-form" id="registrationForm">
+            <!-- Name Fields -->
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label" for="firstName">First Name</label>
+                    <input type="text" id="firstName" name="firstName" class="form-input" placeholder="Enter your first name" required>
+                    <div class="error-message">Please enter your first name</div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="lastName">Last Name</label>
+                    <input type="text" id="lastName" name="lastName" class="form-input" placeholder="Enter your last name" required>
+                    <div class="error-message">Please enter your last name</div>
+                </div>
+            </div>
+
+            <!-- Email -->
+            <div class="form-group">
+                <label class="form-label" for="email">Email Address</label>
+                <input type="email" id="email" name="email" class="form-input" placeholder="Enter your email address" required>
+                <div class="error-message">Please enter a valid email address</div>
+            </div>
+
+            <!-- Password -->
+            <div class="form-group">
+                <label class="form-label" for="password">Password</label>
+                <input type="password" id="password" name="password" class="form-input" placeholder="Create a secure password" required>
+                <div class="error-message">Password must be at least 8 characters long</div>
+            </div>
+
+            <!-- Confirm Password -->
+            <div class="form-group">
+                <label class="form-label" for="confirmPassword">Confirm Password</label>
+                <input type="password" id="confirmPassword" name="confirmPassword" class="form-input" placeholder="Confirm your password" required>
+                <div class="error-message">Passwords do not match</div>
+            </div>
+
+            <!-- Location and Interest -->
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label" for="location">Location</label>
+                    <select id="location" name="location" class="form-select" required>
+                        <option value="">Select your location</option>
+                        <option value="pangasinan">Pangasinan</option>
+                        <option value="luzon">Luzon</option>
+                        <option value="visayas">Visayas</option>
+                        <option value="mindanao">Mindanao</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="interest">Primary Interest</label>
+                    <select id="interest" name="interest" class="form-select" required>
+                        <option value="">Select interest</option>
+                        <option value="conservation">Marine Conservation</option>
+                        <option value="research">Research</option>
+                        <option value="education">Education</option>
+                        <option value="technology">Web3 Technology</option>
+                        <option value="community">Community Action</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Terms and Privacy -->
+            <div class="checkbox-group">
+                <input type="checkbox" id="terms" name="terms" class="checkbox-input" required>
+                <label for="terms" class="checkbox-label">
+                    I agree to the <a href="#" target="_blank">Terms of Service</a> and <a href="#" target="_blank">Privacy Policy</a>
+                </label>
+            </div>
+
+            <div class="checkbox-group">
+                <input type="checkbox" id="newsletter" name="newsletter" class="checkbox-input">
+                <label for="newsletter" class="checkbox-label">
+                    I want to receive updates about coastal protection initiatives and Web3 conservation projects
+                </label>
+            </div>
+
+            <!-- Submit Button -->
+            <button type="submit" class="btn btn-primary">
+                Create Account
+            </button>
+        </form>
+
+        <!-- Wallet Connection Section -->
+        <div class="wallet-section">
+            <div class="wallet-title">Or connect with your Web3 wallet</div>
+            <div class="wallet-buttons">
+                <button type="button" class="btn btn-secondary" id="connectWalletButton">
+                    Connect Plug Wallet
+                </button>
+                <button type="button" class="btn btn-secondary" id="disconnectWalletButton" style="display: none;">
+                    Disconnect Wallet
+                </button>
+            </div>
+            <div id="walletStatus"></div>
+            <div id="principalId"></div>
+            <div id="balance"></div>
+        </div>
+
+        <!-- Footer -->
+        <div class="registration-footer">
+            <p class="footer-text">
+                Already have an account? <a href="../index.html" id="loginLink">Sign in here</a>
+            </p>
+        </div>
+    </div>
+</body>
+</html>

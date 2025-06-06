@@ -1,0 +1,2389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coastal Guardian | Web3 Marine Conservation Platform</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:wght@400;500;600;700&display=swap">
+    <style>
+        :root {
+            --primary-ocean: #0B4D68;
+            --deep-sea: #1B5E7A;
+            --ocean-blue: #2E86AB;
+            --sea-foam: #A8DADC;
+            --coral-reef: #F1FAEE;
+            --wave-crest: #E9F7F7;
+            --seafoam-green: #457B9D;
+            --tidal-pool: #1D3557;
+            --white: #FFFFFF;
+            --dark-text: #1D3557;
+            --medium-text: #457B9D;
+            --light-text: #2E86AB;
+            --warning: #F77F00;
+            --danger: #E63946;
+            --gradient-primary: linear-gradient(135deg, #1D3557 0%, #0B4D68 50%, #2E86AB 100%);
+            --gradient-secondary: linear-gradient(135deg, #A8DADC 0%, #F1FAEE 50%, #E9F7F7 100%);
+            --gradient-accent: linear-gradient(135deg, #457B9D 0%, #2E86AB 100%);
+            --gradient-ocean: linear-gradient(135deg, #0B4D68 0%, #1B5E7A 50%, #2E86AB 100%);
+            --gradient-wave: linear-gradient(135deg, #A8DADC 0%, #F1FAEE 100%);
+            --shadow-soft: 0 4px 20px rgba(29, 53, 87, 0.1);
+            --shadow-medium: 0 8px 30px rgba(29, 53, 87, 0.15);
+            --shadow-strong: 0 15px 40px rgba(29, 53, 87, 0.2);
+            --background: linear-gradient(135deg, #F1FAEE 0%, #E9F7F7 100%);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+            font-size: 16px;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            line-height: 1.6;
+            color: var(--dark-text);
+            background: var(--background);
+            overflow-x: hidden;
+        }
+
+        /* Navigation */
+        .navbar {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(29, 53, 87, 0.1);
+            z-index: 1000;
+            transition: all 0.3s ease;
+            padding: 1rem 0;
+        }
+
+        .navbar.scrolled {
+            background: rgba(255, 255, 255, 0.98);
+            box-shadow: var(--shadow-soft);
+            padding: 0.5rem 0;
+        }
+
+        .nav-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 clamp(1rem, 4vw, 2rem);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(1.2rem, 3vw, 1.5rem);
+            font-weight: 700;
+            color: var(--primary-ocean);
+            text-decoration: none;
+        }
+
+        .logo-icon {
+            width: clamp(32px, 6vw, 40px);
+            height: clamp(32px, 6vw, 40px);
+            background: var(--gradient-accent);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: clamp(1rem, 2.5vw, 1.2rem);
+            color: white;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: clamp(1rem, 3vw, 2rem);
+            align-items: center;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--medium-text);
+            font-weight: 500;
+            font-size: clamp(0.85rem, 2vw, 0.95rem);
+            transition: all 0.3s ease;
+            position: relative;
+            padding: 0.5rem 0;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--ocean-blue);
+            transition: width 0.3s ease;
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        .nav-links a:hover {
+            color: var(--ocean-blue);
+        }
+
+        .wallet-section {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .token-balance {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: var(--gradient-wave);
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            font-weight: 600;
+            color: var(--primary-ocean);
+            font-size: clamp(0.8rem, 2vw, 0.9rem);
+        }
+
+        .connect-wallet {
+            background: var(--gradient-ocean);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 25px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: clamp(0.8rem, 2vw, 0.9rem);
+        }
+
+        .connect-wallet:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-medium);
+        }
+
+        .mobile-menu {
+            display: none;
+            flex-direction: column;
+            cursor: pointer;
+            padding: 8px;
+        }
+
+        .mobile-menu span {
+            width: 25px;
+            height: 3px;
+            background: var(--primary-ocean);
+            margin: 3px 0;
+            transition: 0.3s;
+            border-radius: 2px;
+        }
+
+        /* Hero Section */
+        .hero {
+            min-height: 100vh;
+            background: var(--gradient-ocean);
+            position: relative;
+            display: flex;
+            align-items: center;
+            overflow: hidden;
+            padding-top: 80px;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 120"><path d="M0,0V46.29c47.79,22.2,103.59,32.17,158,28,70.36-5.37,136.33-33.31,206.8-37.5C438.64,32.43,512.34,53.67,583,72.05c69.27,18,138.3,24.88,209.4,13.08,36.15-6,69.85-17.84,104.45-29.34C989.49,25,1113-14.29,1200,52.47V0Z" opacity=".25" fill="%23A8DADC"/><path d="M0,0V15.81C13,36.92,27.64,56.86,47.69,72.05,99.41,111.27,165,111,224.58,91.58c31.15-10.15,60.09-26.07,89.67-39.8,40.92-19,84.73-46,130.83-49.67,36.26-2.85,70.9,9.42,98.6,31.56,31.77,25.39,62.32,62,103.63,73,40.44,10.79,81.35-6.69,119.13-24.28s75.16-39,116.92-43.05c59.73-5.85,113.28,22.88,168.9,38.84,30.2,8.66,59,6.17,87.09-7.5,22.43-10.89,48-26.93,60.65-49.24V0Z" opacity=".5" fill="%23F1FAEE"/><path d="M0,0V5.63C149.93,59,314.09,71.32,475.83,42.57c43-7.64,84.23-20.12,127.61-26.46,59-8.63,112.48,12.24,165.56,35.4C827.93,77.22,886,95.24,951.2,90c86.53-7,172.46-45.71,248.8-84.81V0Z" fill="%23E9F7F7"/></svg>') center bottom/cover no-repeat;
+            opacity: 0.3;
+        }
+
+        .hero-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 clamp(1rem, 4vw, 2rem);
+            position: relative;
+            z-index: 2;
+            color: white;
+            text-align: center;
+        }
+
+        .hero-badge {
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            padding: 0.75rem 2rem;
+            border-radius: 50px;
+            font-size: clamp(0.85rem, 2.5vw, 0.95rem);
+            font-weight: 600;
+            margin-bottom: 2rem;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .hero h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(2.5rem, 8vw, 6rem);
+            font-weight: 700;
+            line-height: 1.1;
+            margin-bottom: 2rem;
+            background: linear-gradient(135deg, #FFFFFF 0%, #A8DADC 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero-subtitle {
+            font-size: clamp(1rem, 3vw, 1.8rem);
+            font-weight: 400;
+            margin-bottom: 3rem;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+            opacity: 0.95;
+            line-height: 1.5;
+        }
+
+        .hero-actions {
+            display: flex;
+            gap: 1.5rem;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 4rem;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: clamp(0.75rem, 2vw, 1rem) clamp(1.5rem, 4vw, 2rem);
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: clamp(0.9rem, 2.5vw, 1rem);
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border: none;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.6s;
+        }
+
+        .btn:hover::before {
+            left: 100%;
+        }
+
+        .btn-primary {
+            background: var(--gradient-secondary);
+            color: var(--primary-ocean);
+            box-shadow: var(--shadow-medium);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-strong);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            backdrop-filter: blur(10px);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-3px);
+        }
+
+        .hero-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: clamp(1rem, 3vw, 2rem);
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .hero-stat {
+            text-align: center;
+            padding: clamp(1rem, 3vw, 1.5rem);
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: transform 0.3s ease;
+        }
+
+        .hero-stat:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-number {
+            font-size: clamp(1.8rem, 5vw, 2.5rem);
+            font-weight: 800;
+            color: var(--sea-foam);
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            font-size: clamp(0.8rem, 2vw, 0.9rem);
+            opacity: 0.9;
+        }
+
+        /* Floating Elements - Removed spinning animation */
+        .floating-elements {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .floating-element {
+            position: absolute;
+            width: clamp(40px, 8vw, 60px);
+            height: clamp(40px, 8vw, 60px);
+            background: rgba(168, 218, 220, 0.1);
+            border-radius: 50%;
+            animation: gentleFloat 8s ease-in-out infinite;
+        }
+
+        .floating-element:nth-child(1) { top: 20%; left: 10%; animation-delay: 0s; }
+        .floating-element:nth-child(2) { top: 60%; left: 80%; animation-delay: 2s; }
+        .floating-element:nth-child(3) { top: 80%; left: 20%; animation-delay: 4s; }
+        .floating-element:nth-child(4) { top: 30%; left: 70%; animation-delay: 1s; }
+        .floating-element:nth-child(5) { top: 70%; left: 50%; animation-delay: 3s; }
+
+        @keyframes gentleFloat {
+            0%, 100% { transform: translateY(0px); opacity: 0.3; }
+            50% { transform: translateY(-20px); opacity: 0.6; }
+        }
+
+        /* Section Styles */
+        section {
+            padding: clamp(3rem, 8vw, 8rem) 0;
+            position: relative;
+        }
+
+        .section-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 clamp(1rem, 4vw, 2rem);
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: clamp(2rem, 6vw, 4rem);
+        }
+
+        .section-badge {
+            display: inline-block;
+            background: var(--gradient-accent);
+            color: white;
+            padding: 0.5rem 1.5rem;
+            border-radius: 50px;
+            font-size: clamp(0.8rem, 2vw, 0.9rem);
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+        }
+
+        .section-title {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(2rem, 6vw, 4rem);
+            font-weight: 700;
+            color: var(--primary-ocean);
+            margin-bottom: 1.5rem;
+            line-height: 1.2;
+        }
+
+        .section-subtitle {
+            font-size: clamp(1rem, 2.5vw, 1.4rem);
+            color: var(--medium-text);
+            max-width: 800px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+
+        /* Marine Protected Areas */
+        .marine-areas {
+            background: var(--white);
+        }
+
+        .areas-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(min(350px, 100%), 1fr));
+            gap: clamp(1.5rem, 4vw, 2rem);
+            margin-top: 3rem;
+        }
+
+        .area-card {
+            background: var(--white);
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: var(--shadow-soft);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border: 1px solid rgba(29, 53, 87, 0.05);
+            position: relative;
+        }
+
+        .area-card:hover {
+            transform: translateY(-10px);
+            box-shadow: var(--shadow-strong);
+        }
+
+        .area-image {
+            height: clamp(200px, 30vw, 250px);
+            background-size: cover;
+            background-position: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .area-image::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(29, 53, 87, 0.3), rgba(46, 134, 171, 0.3));
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .area-card:hover .area-image::before {
+            opacity: 1;
+        }
+
+        .area-badge {
+            position: absolute;
+            top: 1rem;
+            left: 1rem;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: clamp(0.7rem, 2vw, 0.8rem);
+            font-weight: 600;
+            color: var(--primary-ocean);
+        }
+
+        .area-content {
+            padding: clamp(1.5rem, 4vw, 2rem);
+        }
+
+        .area-title {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(1.2rem, 3vw, 1.4rem);
+            font-weight: 600;
+            color: var(--primary-ocean);
+            margin-bottom: 1rem;
+        }
+
+        .area-description {
+            color: var(--medium-text);
+            line-height: 1.7;
+            margin-bottom: 1.5rem;
+            font-size: clamp(0.9rem, 2vw, 1rem);
+        }
+
+        .area-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+        }
+
+        .area-stat {
+            text-align: center;
+            padding: clamp(0.75rem, 2vw, 1rem);
+            background: var(--background);
+            border-radius: 10px;
+        }
+
+        .area-stat-value {
+            font-size: clamp(1rem, 2.5vw, 1.2rem);
+            font-weight: 700;
+            color: var(--ocean-blue);
+            margin-bottom: 0.25rem;
+        }
+
+        .area-stat-label {
+            font-size: clamp(0.7rem, 1.8vw, 0.8rem);
+            color: var(--medium-text);
+        }
+
+        /* Token Dashboard */
+        .token-dashboard {
+            background: var(--background);
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(min(400px, 100%), 1fr));
+            gap: clamp(2rem, 5vw, 3rem);
+            margin-top: 3rem;
+            align-items: start;
+        }
+
+        .token-card {
+            background: var(--white);
+            border-radius: 25px;
+            padding: clamp(2rem, 5vw, 3rem);
+            box-shadow: var(--shadow-medium);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .token-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 6px;
+            background: var(--gradient-accent);
+        }
+
+        .token-visual {
+            width: clamp(100px, 15vw, 120px);
+            height: clamp(100px, 15vw, 120px);
+            background: var(--gradient-ocean);
+            border-radius: 50%;
+            margin: 0 auto 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: clamp(2rem, 5vw, 3rem);
+            color: white;
+            position: relative;
+        }
+
+        .token-visual::after {
+            content: '';
+            position: absolute;
+            top: -10px;
+            left: -10px;
+            right: -10px;
+            bottom: -10px;
+            border: 2px solid var(--ocean-blue);
+            border-radius: 50%;
+            opacity: 0.3;
+        }
+
+        .token-level {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .level-title {
+            font-size: clamp(1.3rem, 3vw, 1.5rem);
+            font-weight: 700;
+            color: var(--primary-ocean);
+            margin-bottom: 0.5rem;
+        }
+
+        .level-subtitle {
+            color: var(--medium-text);
+            font-size: clamp(0.9rem, 2vw, 1rem);
+        }
+
+        .progress-section {
+            margin-bottom: 2rem;
+        }
+
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .progress-label {
+            font-weight: 600;
+            color: var(--primary-ocean);
+            font-size: clamp(0.9rem, 2vw, 1rem);
+        }
+
+        .progress-value {
+            font-weight: 600;
+            color: var(--ocean-blue);
+            font-size: clamp(0.9rem, 2vw, 1rem);
+        }
+
+        .progress-bar-container {
+            width: 100%;
+            height: 12px;
+            background: var(--sea-foam);
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: var(--gradient-accent);
+            border-radius: 6px;
+            transition: width 1s ease;
+        }
+
+        .token-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .token-stat {
+            text-align: center;
+            padding: clamp(1rem, 3vw, 1.5rem);
+            background: var(--background);
+            border-radius: 15px;
+        }
+
+        .token-stat-value {
+            font-size: clamp(1.5rem, 4vw, 2rem);
+            font-weight: 700;
+            color: var(--primary-ocean);
+            margin-bottom: 0.5rem;
+        }
+
+        .token-stat-label {
+            color: var(--medium-text);
+            font-size: clamp(0.8rem, 2vw, 0.9rem);
+        }
+
+        .achievements {
+            background: var(--white);
+            border-radius: 25px;
+            padding: clamp(2rem, 5vw, 3rem);
+            box-shadow: var(--shadow-medium);
+        }
+
+        .achievements-title {
+            font-size: clamp(1.3rem, 3vw, 1.5rem);
+            font-weight: 700;
+            color: var(--primary-ocean);
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .achievement-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .achievement {
+            text-align: center;
+            padding: clamp(1rem, 3vw, 1.5rem) clamp(0.5rem, 2vw, 1rem);
+            background: var(--background);
+            border-radius: 15px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .achievement:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-soft);
+        }
+
+        .achievement.earned {
+            background: var(--gradient-secondary);
+            color: var(--primary-ocean);
+        }
+
+        .achievement-icon {
+            font-size: clamp(1.5rem, 4vw, 2rem);
+            margin-bottom: 0.5rem;
+        }
+
+        .achievement-name {
+            font-size: clamp(0.7rem, 1.8vw, 0.8rem);
+            font-weight: 600;
+        }
+
+        /* Community Actions */
+        .community-actions {
+            background: var(--white);
+        }
+
+        .actions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr));
+            gap: clamp(1.5rem, 4vw, 2rem);
+            margin-top: 3rem;
+        }
+
+        .action-card {
+            background: var(--background);
+            border-radius: 20px;
+            padding: clamp(2rem, 4vw, 2.5rem);
+            text-align: center;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .action-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--gradient-accent);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .action-card:hover {
+            border-color: var(--ocean-blue);
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-medium);
+        }
+
+        .action-card:hover::before {
+            opacity: 0.05;
+        }
+
+        .action-icon {
+            width: clamp(60px, 10vw, 80px);
+            height: clamp(60px, 10vw, 80px);
+            background: var(--gradient-accent);
+            border-radius: 50%;
+            margin: 0 auto 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: clamp(1.5rem, 4vw, 2rem);
+            color: white;
+            position: relative;
+            z-index: 1;
+        }
+
+        .action-title {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(1.1rem, 3vw, 1.3rem);
+            font-weight: 600;
+            color: var(--primary-ocean);
+            margin-bottom: 1rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .action-description {
+            color: var(--medium-text);
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+            position: relative;
+            z-index: 1;
+            font-size: clamp(0.9rem, 2vw, 1rem);
+        }
+
+        .action-reward {
+            display: inline-block;
+            background: var(--gradient-secondary);
+            color: var(--primary-ocean);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: clamp(0.8rem, 2vw, 0.9rem);
+            margin-bottom: 1.5rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .action-btn {
+            background: var(--primary-ocean);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 25px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            z-index: 1;
+            font-size: clamp(0.9rem, 2vw, 1rem);
+        }
+
+        .action-btn:hover {
+            background: var(--deep-sea);
+            transform: translateY(-2px);
+        }
+
+        /* Coastal News */
+        .coastal-news {
+            background: var(--background);
+        }
+
+        .news-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(min(350px, 100%), 1fr));
+            gap: clamp(1.5rem, 4vw, 2rem);
+            margin-top: 3rem;
+        }
+
+        .news-card {
+            background: var(--white);
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: var(--shadow-soft);
+            transition: all 0.3s ease;
+            border: 1px solid rgba(29, 53, 87, 0.05);
+        }
+
+        .news-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-medium);
+        }
+
+        .news-image {
+            height: clamp(180px, 25vw, 200px);
+            background-size: cover;
+            background-position: center;
+            position: relative;
+        }
+
+        .news-date {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 0.5rem 1rem;
+            border-radius: 15px;
+            font-size: clamp(0.7rem, 1.8vw, 0.8rem);
+            font-weight: 600;
+            color: var(--primary-ocean);
+        }
+
+        .news-content {
+            padding: clamp(1.5rem, 4vw, 2rem);
+        }
+
+        .news-category {
+            display: inline-block;
+            background: var(--gradient-accent);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 15px;
+            font-size: clamp(0.7rem, 1.8vw, 0.8rem);
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        .news-title {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(1.1rem, 3vw, 1.3rem);
+            font-weight: 600;
+            color: var(--primary-ocean);
+            margin-bottom: 1rem;
+            line-height: 1.3;
+        }
+
+        .news-excerpt {
+            color: var(--medium-text);
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+            font-size: clamp(0.9rem, 2vw, 1rem);
+        }
+
+        .news-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .news-author {
+            font-size: clamp(0.8rem, 2vw, 0.9rem);
+            color: var(--medium-text);
+        }
+
+        .read-more {
+            color: var(--ocean-blue);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: clamp(0.8rem, 2vw, 0.9rem);
+            transition: color 0.3s ease;
+        }
+
+        .read-more:hover {
+            color: var(--primary-ocean);
+        }
+
+        /* Leaderboard */
+        .leaderboard {
+            background: var(--white);
+        }
+
+        .leaderboard-container {
+            background: var(--white);
+            border-radius: 25px;
+            padding: clamp(2rem, 5vw, 3rem);
+            box-shadow: var(--shadow-medium);
+            margin-top: 3rem;
+        }
+
+        .leaderboard-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .leaderboard-title {
+            font-size: clamp(1.5rem, 4vw, 1.8rem);
+            font-weight: 700;
+            color: var(--primary-ocean);
+            margin-bottom: 1rem;
+        }
+
+        .leaderboard-subtitle {
+            color: var(--medium-text);
+            font-size: clamp(0.9rem, 2vw, 1rem);
+        }
+
+        .guardian-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .guardian-item {
+            display: flex;
+            align-items: center;
+            padding: clamp(1rem, 3vw, 1.5rem);
+            background: var(--background);
+            border-radius: 15px;
+            transition: all 0.3s ease;
+            position: relative;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .guardian-item:hover {
+            transform: translateX(5px);
+            box-shadow: var(--shadow-soft);
+        }
+
+        .guardian-item.top-3 {
+            background: var(--gradient-secondary);
+            color: var(--primary-ocean);
+        }
+
+        .guardian-rank {
+            width: clamp(35px, 6vw, 40px);
+            height: clamp(35px, 6vw, 40px);
+            background: var(--gradient-accent);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            color: white;
+            font-size: clamp(0.9rem, 2vw, 1rem);
+        }
+
+        .guardian-item.top-3 .guardian-rank {
+            background: var(--gradient-ocean);
+        }
+
+        .guardian-avatar {
+            width: clamp(40px, 7vw, 50px);
+            height: clamp(40px, 7vw, 50px);
+            background: var(--gradient-accent);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: clamp(1.2rem, 3vw, 1.5rem);
+            color: white;
+        }
+
+        .guardian-info {
+            flex: 1;
+            min-width: 150px;
+        }
+
+        .guardian-name {
+            font-weight: 700;
+            font-size: clamp(1rem, 2.5vw, 1.1rem);
+            margin-bottom: 0.25rem;
+        }
+
+        .guardian-level {
+            font-size: clamp(0.8rem, 2vw, 0.9rem);
+            opacity: 0.8;
+        }
+
+        .guardian-stats {
+            display: flex;
+            gap: clamp(1rem, 3vw, 2rem);
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .guardian-stat {
+            text-align: center;
+            min-width: 80px;
+        }
+
+        .guardian-stat-value {
+            font-weight: 700;
+            font-size: clamp(0.9rem, 2.5vw, 1.1rem);
+            margin-bottom: 0.25rem;
+        }
+
+        .guardian-stat-label {
+            font-size: clamp(0.7rem, 1.8vw, 0.8rem);
+            opacity: 0.8;
+        }
+
+        /* About/FAQ */
+        .about-faq {
+            background: var(--background);
+        }
+
+        .about-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(min(400px, 100%), 1fr));
+            gap: clamp(2rem, 5vw, 4rem);
+            margin-top: 3rem;
+        }
+
+        .about-content {
+            background: var(--white);
+            border-radius: 25px;
+            padding: clamp(2rem, 5vw, 3rem);
+            box-shadow: var(--shadow-medium);
+        }
+
+        .about-title {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(1.5rem, 4vw, 2rem);
+            font-weight: 700;
+            color: var(--primary-ocean);
+            margin-bottom: 2rem;
+        }
+
+        .about-text {
+            color: var(--medium-text);
+            line-height: 1.7;
+            margin-bottom: 2rem;
+            font-size: clamp(0.9rem, 2vw, 1rem);
+        }
+
+        .team-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .team-member {
+            text-align: center;
+            padding: clamp(1rem, 3vw, 1.5rem);
+            background: var(--background);
+            border-radius: 15px;
+        }
+
+        .team-avatar {
+            width: clamp(50px, 8vw, 60px);
+            height: clamp(50px, 8vw, 60px);
+            background: var(--gradient-accent);
+            border-radius: 50%;
+            margin: 0 auto 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: clamp(1.2rem, 3vw, 1.5rem);
+            color: white;
+        }
+
+        .team-name {
+            font-weight: 600;
+            color: var(--primary-ocean);
+            margin-bottom: 0.25rem;
+            font-size: clamp(0.9rem, 2vw, 1rem);
+        }
+
+        .team-role {
+            font-size: clamp(0.8rem, 1.8vw, 0.9rem);
+            color: var(--medium-text);
+        }
+
+        .faq-content {
+            background: var(--white);
+            border-radius: 25px;
+            padding: clamp(2rem, 5vw, 3rem);
+            box-shadow: var(--shadow-medium);
+        }
+
+        .faq-title {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(1.5rem, 4vw, 2rem);
+            font-weight: 700;
+            color: var(--primary-ocean);
+            margin-bottom: 2rem;
+        }
+
+        .faq-item {
+            margin-bottom: 1.5rem;
+            border-bottom: 1px solid rgba(29, 53, 87, 0.1);
+            padding-bottom: 1.5rem;
+        }
+
+        .faq-question {
+            font-weight: 600;
+            color: var(--primary-ocean);
+            margin-bottom: 0.75rem;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: clamp(0.9rem, 2vw, 1rem);
+        }
+
+        .faq-answer {
+            color: var(--medium-text);
+            line-height: 1.6;
+            display: none;
+            font-size: clamp(0.9rem, 2vw, 1rem);
+        }
+
+        .faq-answer.active {
+            display: block;
+        }
+
+        .faq-toggle {
+            font-size: 1.2rem;
+            transition: transform 0.3s ease;
+        }
+
+        .faq-item.active .faq-toggle {
+            transform: rotate(45deg);
+        }
+
+        /* Footer - Fixed visibility */
+        .footer {
+            background: var(--tidal-pool);
+            color: white;
+            padding: clamp(3rem, 6vw, 4rem) 0 clamp(1.5rem, 3vw, 2rem);
+            text-align: center;
+        }
+
+        .footer-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 clamp(1rem, 4vw, 2rem);
+        }
+
+        .footer-logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .footer-logo-icon {
+            width: clamp(40px, 8vw, 50px);
+            height: clamp(40px, 8vw, 50px);
+            background: var(--gradient-secondary);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: clamp(1.2rem, 3vw, 1.5rem);
+            color: var(--primary-ocean);
+        }
+
+        .footer-logo-text {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(1.5rem, 4vw, 1.8rem);
+            font-weight: 700;
+        }
+
+        .footer-description {
+            max-width: 600px;
+            margin: 0 auto 3rem;
+            opacity: 0.9;
+            line-height: 1.6;
+            font-size: clamp(0.9rem, 2vw, 1rem);
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: clamp(1rem, 3vw, 2rem);
+            margin-bottom: 3rem;
+            flex-wrap: wrap;
+        }
+
+        .footer-links a {
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            transition: color 0.3s ease;
+            font-size: clamp(0.9rem, 2vw, 1rem);
+        }
+
+        .footer-links a:hover {
+            color: var(--sea-foam);
+        }
+
+        .footer-bottom {
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding-top: 2rem;
+            opacity: 0.7;
+            font-size: clamp(0.8rem, 2vw, 0.9rem);
+        }
+
+        /* Enhanced Responsive Design */
+        @media (max-width: 1024px) {
+            .hero-stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+
+            .mobile-menu {
+                display: flex;
+            }
+
+            .wallet-section {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+
+            .hero-actions {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .btn {
+                width: 100%;
+                max-width: 300px;
+                justify-content: center;
+            }
+
+            .hero-stats {
+                grid-template-columns: 1fr;
+            }
+
+            .guardian-stats {
+                justify-content: center;
+            }
+
+            .guardian-item {
+                justify-content: center;
+                text-align: center;
+            }
+
+            .footer-links {
+                flex-direction: column;
+                gap: 1rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .achievement-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .team-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .area-stats {
+                grid-template-columns: 1fr;
+                gap: 0.5rem;
+            }
+
+            .token-stats {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Scroll Animations */
+        .fade-in {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.6s ease;
+        }
+
+        .fade-in.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .slide-in-left {
+            opacity: 0;
+            transform: translateX(-50px);
+            transition: all 0.6s ease;
+        }
+
+        .slide-in-left.visible {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .slide-in-right {
+            opacity: 0;
+            transform: translateX(50px);
+            transition: all 0.6s ease;
+        }
+
+        .slide-in-right.visible {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        /* Accessibility improvements */
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+
+        /* Focus styles for better accessibility */
+        .btn:focus,
+        .action-btn:focus,
+        .connect-wallet:focus {
+            outline: 2px solid var(--ocean-blue);
+            outline-offset: 2px;
+        }
+
+        .nav-links a:focus {
+            outline: 2px solid var(--ocean-blue);
+            outline-offset: 4px;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Navigation -->
+    <nav class="navbar" id="navbar">
+        <div class="nav-container">
+            <a href="#hero" class="logo">
+                <div class="logo-icon">🌊</div>
+                Coastal Guardian
+            </a>
+            <ul class="nav-links">
+                <li><a href="#marine-areas">Protected Areas</a></li>
+                <li><a href="#dashboard">Dashboard</a></li>
+                <li><a href="#actions">Actions</a></li>
+                <li><a href="#news">News</a></li>
+                <li><a href="#leaderboard">Guardians</a></li>
+                <li><a href="#about">About</a></li>
+                <li><a href="shop.html">Shop</a></li>
+            </ul>
+            <div class="wallet-section">
+                <div class="token-balance" id="tokenBalance" style="display: none;">
+                    <span>🏆</span>
+                    <span id="balanceAmount">0 CGT</span>
+                </div>
+                <button class="connect-wallet" id="connectWallet" onclick="window.location.href ='../index.html'" >Logout</button>
+                <button class="connect-wallet" id="connectWallet">Connect Wallet</button>
+            </div>
+            <div class="mobile-menu" id="mobileMenu">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="hero" class="hero">
+        <div class="floating-elements">
+            <div class="floating-element"></div>
+            <div class="floating-element"></div>
+            <div class="floating-element"></div>
+            <div class="floating-element"></div>
+            <div class="floating-element"></div>
+        </div>
+
+        <div class="hero-content">
+            <div class="hero-badge">🌊 Web3 Marine Conservation Platform</div>
+            <h1>Protect Our Oceans, Earn Soulbound Tokens</h1>
+            <p class="hero-subtitle">
+                Join the global movement to preserve coastal ecosystems through blockchain technology.
+                Every conservation action you take is permanently recorded and rewarded with unique soulbound tokens.
+            </p>
+
+            <div class="hero-actions">
+                <a href="#dashboard" class="btn btn-primary">
+                    🚀 Start Your Journey
+                </a>
+                <a href="#marine-areas" class="btn btn-secondary">
+                    🌿 Explore Areas
+                </a>
+            </div>
+
+            <div class="hero-stats">
+                <div class="hero-stat">
+                    <span class="stat-number">12,847</span>
+                    <span class="stat-label">Active Guardians</span>
+                </div>
+                <div class="hero-stat">
+                    <span class="stat-number">2.4M</span>
+                    <span class="stat-label">Hectares Protected</span>
+                </div>
+                <div class="hero-stat">
+                    <span class="stat-number">89,432</span>
+                    <span class="stat-label">Conservation Actions</span>
+                </div>
+                <div class="hero-stat">
+                    <span class="stat-number">156K</span>
+                    <span class="stat-label">Tokens Earned</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Marine Protected Areas -->
+    <section id="marine-areas" class="marine-areas">
+        <div class="section-container">
+            <div class="section-header fade-in">
+                <div class="section-badge">🌿 Conservation Zones</div>
+                <h2 class="section-title">Marine Protected Areas</h2>
+                <p class="section-subtitle">
+                    Discover the critical coastal ecosystems we're protecting through community action and blockchain
+                    verification.
+                    Each area represents a unique opportunity to contribute to marine conservation.
+                </p>
+            </div>
+
+            <div class="areas-grid">
+                <div class="area-card fade-in">
+                    <div class="area-image"
+                        style="background-image: url('https://images.unsplash.com/photo-1578662996442-48f60103fc96?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80');">
+                        <div class="area-badge">Marine Sanctuary</div>
+                    </div>
+                    <div class="area-content">
+                        <h3 class="area-title">Hundred Islands National Park</h3>
+                        <p class="area-description">
+                            A pristine archipelago of 124 limestone islands supporting diverse marine ecosystems, coral
+                            reefs, and endemic species.
+                        </p>
+                        <div class="area-stats">
+                            <div class="area-stat">
+                                <div class="area-stat-value">96%</div>
+                                <div class="area-stat-label">Health Score</div>
+                            </div>
+                            <div class="area-stat">
+                                <div class="area-stat-value">387</div>
+                                <div class="area-stat-label">Species</div>
+                            </div>
+                            <div class="area-stat">
+                                <div class="area-stat-value">2.1K</div>
+                                <div class="area-stat-label">Hectares</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="area-card fade-in">
+                    <div class="area-image"
+                        style="background-image: url('https://images.unsplash.com/photo-1583212292454-1fe6229603b7?ixlib=rb-4.0.3&auto=format&fit=crop&w=2074&q=80');">
+                        <div class="area-badge">Research Station</div>
+                    </div>
+                    <div class="area-content">
+                        <h3 class="area-title">Bolinao Marine Laboratory</h3>
+                        <p class="area-description">
+                            Leading marine research facility protecting coral reefs, seagrass beds, and mangrove
+                            ecosystems through scientific innovation.
+                        </p>
+                        <div class="area-stats">
+                            <div class="area-stat">
+                                <div class="area-stat-value">89%</div>
+                                <div class="area-stat-label">Water Quality</div>
+                            </div>
+                            <div class="area-stat">
+                                <div class="area-stat-value">234</div>
+                                <div class="area-stat-label">Species</div>
+                            </div>
+                            <div class="area-stat">
+                                <div class="area-stat-value">1.8K</div>
+                                <div class="area-stat-label">Hectares</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="area-card fade-in">
+                    <div class="area-image"
+                        style="background-image: url('https://images.unsplash.com/photo-1559827260-dc66d52bef19?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80');">
+                        <div class="area-badge">Mangrove Forest</div>
+                    </div>
+                    <div class="area-content">
+                        <h3 class="area-title">Alaminos Mangrove Reserve</h3>
+                        <p class="area-description">
+                            Extensive mangrove ecosystem providing coastal protection, carbon sequestration, and nursery
+                            habitat for marine species.
+                        </p>
+                        <div class="area-stats">
+                            <div class="area-stat">
+                                <div class="area-stat-value">94%</div>
+                                <div class="area-stat-label">Forest Cover</div>
+                            </div>
+                            <div class="area-stat">
+                                <div class="area-stat-value">178</div>
+                                <div class="area-stat-label">Species</div>
+                            </div>
+                            <div class="area-stat">
+                                <div class="area-stat-value">2.7K</div>
+                                <div class="area-stat-label">Hectares</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Token Dashboard -->
+    <section id="dashboard" class="token-dashboard">
+        <div class="section-container">
+            <div class="section-header fade-in">
+                <div class="section-badge">🏆 Your Impact</div>
+                <h2 class="section-title">Guardian Dashboard</h2>
+                <p class="section-subtitle">
+                    Track your conservation journey and soulbound token achievements. Every action contributes to marine
+                    protection and your Guardian status.
+                </p>
+            </div>
+
+            <div class="dashboard-grid">
+                <div class="token-card slide-in-left">
+                    <div class="token-visual">🌊</div>
+                    <div class="token-level">
+                        <div class="level-title">Ocean Guardian</div>
+                        <div class="level-subtitle">Level 3 • Soulbound Token Holder</div>
+                    </div>
+
+                    <div class="progress-section">
+                        <div class="progress-header">
+                            <span class="progress-label">Progress to Next Level</span>
+                            <span class="progress-value">750/1000 XP</span>
+                        </div>
+                        <div class="progress-bar-container">
+                            <div class="progress-bar" style="width: 75%"></div>
+                        </div>
+                    </div>
+
+                    <div class="token-stats">
+                        <div class="token-stat">
+                            <div class="token-stat-value">1,247</div>
+                            <div class="token-stat-label">CGT Earned</div>
+                        </div>
+                        <div class="token-stat">
+                            <div class="token-stat-value">23</div>
+                            <div class="token-stat-label">Actions Completed</div>
+                        </div>
+                        <div class="token-stat">
+                            <div class="token-stat-value">156</div>
+                            <div class="token-stat-label">Trees Planted</div>
+                        </div>
+                        <div class="token-stat">
+                            <div class="token-stat-value">89</div>
+                            <div class="token-stat-label">Days Active</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="achievements slide-in-right">
+                    <h3 class="achievements-title">Conservation Achievements</h3>
+                    <div class="achievement-grid">
+                        <div class="achievement earned">
+                            <div class="achievement-icon">🌱</div>
+                            <div class="achievement-name">First Planting</div>
+                        </div>
+                        <div class="achievement earned">
+                            <div class="achievement-icon">🏖️</div>
+                            <div class="achievement-name">Beach Cleaner</div>
+                        </div>
+                        <div class="achievement earned">
+                            <div class="achievement-icon">🐠</div>
+                            <div class="achievement-name">Marine Monitor</div>
+                        </div>
+                        <div class="achievement earned">
+                            <div class="achievement-icon">📊</div>
+                            <div class="achievement-name">Data Collector</div>
+                        </div>
+                        <div class="achievement">
+                            <div class="achievement-icon">🏆</div>
+                            <div class="achievement-name">Guardian Elite</div>
+                        </div>
+                        <div class="achievement">
+                            <div class="achievement-icon">🌊</div>
+                            <div class="achievement-name">Ocean Master</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Community Actions -->
+    <section id="actions" class="community-actions">
+        <div class="section-container">
+            <div class="section-header fade-in">
+                <div class="section-badge">🚀 Take Action</div>
+                <h2 class="section-title">Community Conservation</h2>
+                <p class="section-subtitle">
+                    Participate in verified conservation activities and earn soulbound tokens. Each action is recorded
+                    on the blockchain for transparency and impact tracking.
+                </p>
+            </div>
+
+            <div class="actions-grid">
+                <div class="action-card fade-in">
+                    <div class="action-icon">🌱</div>
+                    <h3 class="action-title">Mangrove Planting</h3>
+                    <p class="action-description">
+                        Join community mangrove restoration projects. Plant native species and help rebuild coastal
+                        barriers against climate change.
+                    </p>
+                    <div class="action-reward">+50 CGT per tree planted</div>
+                    <button class="action-btn" onclick="window.location.href='coastal_cleanup.html'">Join Event</button>
+                </div>
+
+                <div class="action-card fade-in">
+                    <div class="action-icon">🏖️</div>
+                    <h3 class="action-title">Beach Cleanup</h3>
+                    <p class="action-description">
+                        Organize or participate in beach cleanup events. Remove plastic waste and protect marine life
+                        from pollution.
+                    </p>
+                    <div class="action-reward">+25 CGT per kg collected</div>
+                    <button class="action-btn" onclick="window.location.href='coastal_cleanup.html'">Join Event</button>
+                </div>
+
+                <div class="action-card fade-in">
+                    <div class="action-icon">🔬</div>
+                    <h3 class="action-title">Water Quality Monitoring</h3>
+                    <p class="action-description">
+                        Contribute to citizen science by monitoring water quality parameters and reporting ecosystem
+                        health data.
+                    </p>
+                    <div class="action-reward">+75 CGT per report</div>
+                    <button class="action-btn" onclick="window.location.href='coastal_cleanup.html'">Join Event</button>
+                </div>
+
+                <div class="action-card fade-in">
+                    <div class="action-icon">📸</div>
+                    <h3 class="action-title">Wildlife Documentation</h3>
+                    <p class="action-description">
+                        Document marine wildlife sightings and contribute to biodiversity databases for conservation
+                        research.
+                    </p>
+                    <div class="action-reward">+30 CGT per verified sighting</div>
+                    <button class="action-btn" onclick="window.location.href='picture.html'">Join Event</button>
+                </div>
+
+                <div class="action-card fade-in">
+                    <div class="action-icon">🎓</div>
+                    <h3 class="action-title">Education Outreach</h3>
+                    <p class="action-description">
+                        Lead educational workshops about marine conservation in schools and communities to raise
+                        awareness.
+                    </p>
+                    <div class="action-reward">+100 CGT per workshop</div>
+                    <button class="action-btn" onclick="window.location.href='coastal_cleanup.html'">Join Event</button>
+                </div>
+
+                <div class="action-card fade-in">
+                    <div class="action-icon">🚨</div>
+                    <h3 class="action-title">Threat Reporting</h3>
+                    <p class="action-description">
+                        Report environmental threats like illegal fishing, pollution, or habitat destruction to
+                        conservation authorities.
+                    </p>
+                    <div class="action-reward">+150 CGT per verified report</div>
+                    <button class="action-btn" onclick="window.location.href='reports.html'">Join Event</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Coastal News -->
+    <section id="news" class="coastal-news">
+        <div class="section-container">
+            <div class="section-header fade-in">
+                <div class="section-badge">📰 Latest Updates</div>
+                <h2 class="section-title">Coastal Conservation News</h2>
+                <p class="section-subtitle">
+                    Stay informed about the latest developments in marine conservation, research breakthroughs, and
+                    community achievements.
+                </p>
+            </div>
+
+            <div class="news-grid">
+                <div class="news-card fade-in">
+                    <div class="news-image"
+                        style="background-image: url('https://images.unsplash.com/photo-1583212292454-1fe6229603b7?ixlib=rb-4.0.3&auto=format&fit=crop&w=2074&q=80');">
+                        <div class="news-date">Dec 15, 2024</div>
+                    </div>
+                    <div class="news-content">
+                        <div class="news-category">Research</div>
+                        <h3 class="news-title">Breakthrough in Coral Restoration Technology</h3>
+                        <p class="news-excerpt">
+                            Scientists at Bolinao Marine Laboratory have developed a new technique that increases coral
+                            survival rates by 40% in restoration projects.
+                        </p>
+                        <div class="news-footer">
+                            <span class="news-author">Dr. Maria Santos</span>
+                            <a href="#" class="read-more">Read More →</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="news-card fade-in">
+                    <div class="news-image"
+                        style="background-image: url('https://images.unsplash.com/photo-1559827260-dc66d52bef19?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80');">
+                        <div class="news-date">Dec 12, 2024</div>
+                    </div>
+                    <div class="news-content">
+                        <div class="news-category">Community</div>
+                        <h3 class="news-title">Record-Breaking Mangrove Planting Event</h3>
+                        <p class="news-excerpt">
+                            Over 500 volunteers planted 10,000 mangrove seedlings in a single day, setting a new record
+                            for community conservation action.
+                        </p>
+                        <div class="news-footer">
+                            <span class="news-author">Community Team</span>
+                            <a href="#" class="read-more">Read More →</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="news-card fade-in">
+                    <div class="news-image"
+                        style="background-image: url('https://images.unsplash.com/photo-1578662996442-48f60103fc96?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80');">
+                        <div class="news-date">Dec 10, 2024</div>
+                    </div>
+                    <div class="news-content">
+                        <div class="news-category">Technology</div>
+                        <h3 class="news-title">New Blockchain Platform Launches for Ocean Conservation</h3>
+                        <p class="news-excerpt">
+                            Coastal Guardian platform officially launches, enabling transparent tracking of conservation
+                            efforts through soulbound tokens and Web3 technology.
+                        </p>
+                        <div class="news-footer">
+                            <span class="news-author">Tech Team</span>
+                            <a href="#" class="read-more">Read More →</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="news-card fade-in">
+                    <div class="news-image"
+                        style="background-image: url('https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80');">
+                        <div class="news-date">Dec 8, 2024</div>
+                    </div>
+                    <div class="news-content">
+                        <div class="news-category">Conservation</div>
+                        <h3 class="news-title">Marine Protected Area Expansion Approved</h3>
+                        <p class="news-excerpt">
+                            Government approves expansion of Hundred Islands National Park, adding 500 hectares of
+                            critical marine habitat to protected status.
+                        </p>
+                        <div class="news-footer">
+                            <span class="news-author">Policy Team</span>
+                            <a href="#" class="read-more">Read More →</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="news-card fade-in">
+                    <div class="news-image"
+                        style="background-image: url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?ixlib=rb-4.0.3&auto=format&fit=crop&w=2073&q=80');">
+                        <div class="news-date">Dec 5, 2024</div>
+                    </div>
+                    <div class="news-content">
+                        <div class="news-category">Research</div>
+                        <h3 class="news-title">Seagrass Restoration Shows Promising Results</h3>
+                        <p class="news-excerpt">
+                            Three-year seagrass restoration project at Bani Sanctuary shows 85% survival rate and
+                            increased marine biodiversity.
+                        </p>
+                        <div class="news-footer">
+                            <span class="news-author">Research Team</span>
+                            <a href="#" class="read-more">Read More →</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="news-card fade-in">
+                    <div class="news-image"
+                        style="background-image: url('https://images.unsplash.com/photo-1544551763-46a013bb70d5?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80');">
+                        <div class="news-date">Dec 3, 2024</div>
+                    </div>
+                    <div class="news-content">
+                        <div class="news-category">Community</div>
+                        <h3 class="news-title">Youth Conservation Program Graduates First Class</h3>
+                        <p class="news-excerpt">
+                            50 young environmental leaders complete intensive marine conservation training program,
+                            ready to lead community initiatives.
+                        </p>
+                        <div class="news-footer">
+                            <span class="news-author">Education Team</span>
+                            <a href="#" class="read-more">Read More →</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Leaderboard -->
+    <section id="leaderboard" class="leaderboard">
+        <div class="section-container">
+            <div class="section-header fade-in">
+                <div class="section-badge">🏆 Top Contributors</div>
+                <h2 class="section-title">Guardian Leaderboard</h2>
+                <p class="section-subtitle">
+                    Celebrating the most dedicated ocean guardians who are making a real difference in marine
+                    conservation through verified actions.
+                </p>
+            </div>
+
+            <div class="leaderboard-container">
+                <div class="leaderboard-header">
+                    <h3 class="leaderboard-title">Top Ocean Guardians</h3>
+                    <p class="leaderboard-subtitle">Ranked by conservation impact and community contributions</p>
+                </div>
+
+                <div class="guardian-list">
+                    <div class="guardian-item top-3 fade-in">
+                        <div class="guardian-rank">1</div>
+                        <div class="guardian-avatar">🌊</div>
+                        <div class="guardian-info">
+                            <div class="guardian-name">Marina Rodriguez</div>
+                            <div class="guardian-level">Ocean Master • Level 8</div>
+                        </div>
+                        <div class="guardian-stats">
+                            <div class="guardian-stat">
+                                <div class="guardian-stat-value">4,892</div>
+                                <div class="guardian-stat-label">CGT Earned</div>
+                            </div>
+                            <div class="guardian-stat">
+                                <div class="guardian-stat-value">156</div>
+                                <div class="guardian-stat-label">Actions</div>
+                            </div>
+                            <div class="guardian-stat">
+                                <div class="guardian-stat-value">2,340</div>
+                                <div class="guardian-stat-label">Trees Planted</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="guardian-item top-3 fade-in">
+                        <div class="guardian-rank">2</div>
+                        <div class="guardian-avatar">🐠</div>
+                        <div class="guardian-info">
+                            <div class="guardian-name">Carlos Mendoza</div>
+                            <div class="guardian-level">Reef Guardian • Level 7</div>
+                        </div>
+                        <div class="guardian-stats">
+                            <div class="guardian-stat">
+                                <div class="guardian-stat-value">4,156</div>
+                                <div class="guardian-stat-label">CGT Earned</div>
+                            </div>
+                            <div class="guardian-stat">
+                                <div class="guardian-stat-value">134</div>
+                                <div class="guardian-stat-label">Actions</div>
+                            </div>
+                            <div class="guardian-stat">
+                                <div class="guardian-stat-value">1,890</div>
+                                <div class="guardian-stat-label">Trees Planted</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="guardian-item top-3 fade-in">
+                        <div class="guardian-rank">3</div>
+                        <div class="guardian-avatar">🌱</div>
+                        <div class="guardian-info">
+                            <div class="guardian-name">Sarah Chen</div>
+                            <div class="guardian-level">Mangrove Guardian • Level 6</div>
+                        </div>
+                        <div class="guardian-stats">
+                            <div class="guardian-stat">
+                                <div class="guardian-stat-value">3,742</div>
+                                <div class="guardian-stat-label">CGT Earned</div>
+                            </div>
+                            <div class="guardian-stat">
+                                <div class="guardian-stat-value">118</div>
+                                <div class="guardian-stat-label">Actions</div>
+                            </div>
+                            <div class="guardian-stat">
+                                <div class="guardian-stat-value">1,567</div>
+                                <div class="guardian-stat-label">Trees Planted</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="guardian-item fade-in">
+                        <div class="guardian-rank">4</div>
+                        <div class="guardian-avatar">🏖️</div>
+                        <div class="guardian-info">
+                            <div class="guardian-name">Ahmed Hassan</div>
+                            <div class="guardian-level">Beach Guardian • Level 5</div>
+                        </div>
+                        <div class="guardian-stats">
+                            <div class="guardian-stat">
+                                <div class="guardian-stat-value">2,934</div>
+                                <div class="guardian-stat-label">CGT Earned</div>
+                            </div>
+                            <div class="guardian-stat">
+                                <div class="guardian-stat-value">97</div>
+                                <div class="guardian-stat-label">Actions</div>
+                            </div>
+                            <div class="guardian-stat">
+                                <div class="guardian-stat-value">1,234</div>
+                                <div class="guardian-stat-label">Trees Planted</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="guardian-item fade-in">
+                        <div class="guardian-rank">5</div>
+                        <div class="guardian-avatar">🔬</div>
+                        <div class="guardian-info">
+                            <div class="guardian-name">Dr. Lisa Park</div>
+                            <div class="guardian-level">Research Guardian • Level 5</div>
+                        </div>
+                        <div class="guardian-stats">
+                            <div class="guardian-stat">
+                                <div class="guardian-stat-value">2,678</div>
+                                <div class="guardian-stat-label">CGT Earned</div>
+                            </div>
+                            <div class="guardian-stat">
+                                <div class="guardian-stat-value">89</div>
+                                <div class="guardian-stat-label">Actions</div>
+                            </div>
+                            <div class="guardian-stat">
+                                <div class="guardian-stat-value">1,045</div>
+                                <div class="guardian-stat-label">Trees Planted</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About/FAQ -->
+    <section id="about" class="about-faq">
+        <div class="section-container">
+            <div class="section-header fade-in">
+                <div class="section-badge">ℹ️ Learn More</div>
+                <h2 class="section-title">About Coastal Guardian</h2>
+                <p class="section-subtitle">
+                    Discover our mission, meet our team, and get answers to common questions about our Web3 marine
+                    conservation platform.
+                </p>
+            </div>
+
+            <div class="about-grid">
+                <div class="about-content slide-in-left">
+                    <h3 class="about-title">Our Mission</h3>
+                    <p class="about-text">
+                        Coastal Guardian is revolutionizing marine conservation through blockchain technology and
+                        community engagement.
+                        We believe that every conservation action, no matter how small, contributes to the health of our
+                        oceans.
+                    </p>
+                    <p class="about-text">
+                        Our platform uses soulbound tokens to create permanent, verifiable records of conservation
+                        efforts,
+                        ensuring transparency and accountability while rewarding those who dedicate their time to
+                        protecting marine ecosystems.
+                    </p>
+                    <p class="about-text">
+                        By combining cutting-edge Web3 technology with proven conservation science, we're building a
+                        global
+                        community of ocean guardians committed to preserving marine biodiversity for future generations.
+                    </p>
+
+                    <h4 style="margin-top: 2rem; margin-bottom: 1rem; color: var(--primary-ocean); font-weight: 600;">
+                        Our Team</h4>
+                    <div class="team-grid">
+                        <div class="team-member">
+                            <div class="team-avatar">👩‍🔬</div>
+                            <div class="team-name">Dr. Maria Santos</div>
+                            <div class="team-role">Marine Biologist</div>
+                        </div>
+                        <div class="team-member">
+                            <div class="team-avatar">👨‍💻</div>
+                            <div class="team-name">Alex Chen</div>
+                            <div class="team-role">Blockchain Developer</div>
+                        </div>
+                        <div class="team-member">
+                            <div class="team-avatar">👩‍🎨</div>
+                            <div class="team-name">Sofia Rodriguez</div>
+                            <div class="team-role">UX Designer</div>
+                        </div>
+                        <div class="team-member">
+                            <div class="team-avatar">👨‍🌾</div>
+                            <div class="team-name">James Wilson</div>
+                            <div class="team-role">Conservation Manager</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="faq-content slide-in-right">
+                    <h3 class="faq-title">Frequently Asked Questions</h3>
+
+                    <div class="faq-item">
+                        <div class="faq-question">
+                            What are soulbound tokens?
+                            <span class="faq-toggle">+</span>
+                        </div>
+                        <div class="faq-answer">
+                            Soulbound tokens (SBTs) are non-transferable digital certificates that permanently record
+                            your conservation achievements.
+                            Unlike regular NFTs, they cannot be sold or transferred, making them perfect for
+                            representing personal accomplishments and contributions.
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <div class="faq-question">
+                            How do I earn CGT tokens?
+                            <span class="faq-toggle">+</span>
+                        </div>
+                        <div class="faq-answer">
+                            You earn Coastal Guardian Tokens (CGT) by participating in verified conservation activities
+                            such as mangrove planting,
+                            beach cleanups, water quality monitoring, and educational outreach. Each action is verified
+                            and recorded on the blockchain.
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <div class="faq-question">
+                            Is the platform free to use?
+                            <span class="faq-toggle">+</span>
+                        </div>
+                        <div class="faq-answer">
+                            Yes! Coastal Guardian is completely free to use. We believe conservation should be
+                            accessible to everyone.
+                            You only need a Web3 wallet to connect and start earning tokens for your conservation
+                            efforts.
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <div class="faq-question">
+                            How are conservation actions verified?
+                            <span class="faq-toggle">+</span>
+                        </div>
+                        <div class="faq-answer">
+                            We use a combination of GPS tracking, photo verification, community validation, and
+                            partnerships with local
+                            conservation organizations to ensure all reported actions are legitimate and impactful.
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <div class="faq-question">
+                            Can I participate without crypto knowledge?
+                            <span class="faq-toggle">+</span>
+                        </div>
+                        <div class="faq-answer">
+                            Our platform is designed to be user-friendly for everyone. We provide step-by-step guides
+                            for setting up
+                            a wallet and participating in conservation activities, regardless of your Web3 experience.
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <div class="faq-question">
+                            What impact does my participation have?
+                            <span class="faq-toggle">+</span>
+                        </div>
+                        <div class="faq-answer">
+                            Every action contributes to real conservation outcomes. Your participation helps restore
+                            marine habitats,
+                            protect endangered species, improve water quality, and build resilient coastal communities
+                            while creating
+                            a permanent record of positive environmental impact.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-logo">
+                <div class="footer-logo-icon">🌊</div>
+                <div class="footer-logo-text">Coastal Guardian</div>
+            </div>
+
+            <p class="footer-description">
+                Protecting marine ecosystems through Web3 technology and community action.
+                Join the global movement to preserve our oceans for future generations.
+            </p>
+
+            <div class="footer-links">
+                <a href="#marine-areas">Protected Areas</a>
+                <a href="#dashboard">Dashboard</a>
+                <a href="#actions">Take Action</a>
+                <a href="#news">News</a>
+                <a href="#leaderboard">Leaderboard</a>
+                <a href="#about">About</a>
+                <a href="#">Privacy Policy</a>
+                <a href="#">Terms of Service</a>
+            </div>
+
+            <div class="footer-bottom">
+                <p>© 2024 Coastal Guardian. Building a sustainable future through blockchain conservation.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Navbar scroll effect
+        window.addEventListener('scroll', () => {
+            const navbar = document.getElementById('navbar');
+            if (window.scrollY > 100) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+        });
+
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    const offsetTop = target.offsetTop - 80;
+                    window.scrollTo({
+                        top: offsetTop,
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+
+        // Wallet connection simulation
+        const connectWalletBtn = document.getElementById('connectWallet');
+        const tokenBalance = document.getElementById('tokenBalance');
+        const balanceAmount = document.getElementById('balanceAmount');
+
+        let isConnected = false;
+
+        connectWalletBtn.addEventListener('click', () => {
+            if (!isConnected) {
+                // Simulate wallet connection
+                setTimeout(() => {
+                    connectWalletBtn.textContent = '0x1234...5678';
+                    connectWalletBtn.style.background = 'var(--gradient-secondary)';
+                    connectWalletBtn.style.color = 'var(--primary-ocean)';
+                    tokenBalance.style.display = 'flex';
+                    balanceAmount.textContent = '1,247 CGT';
+                    isConnected = true;
+                }, 1000);
+
+                connectWalletBtn.textContent = 'Connecting...';
+                connectWalletBtn.disabled = true;
+
+                setTimeout(() => {
+                    connectWalletBtn.disabled = false;
+                }, 1000);
+            } else {
+                // Disconnect wallet
+                connectWalletBtn.textContent = 'Connect Wallet';
+                connectWalletBtn.style.background = 'var(--gradient-ocean)';
+                connectWalletBtn.style.color = 'white';
+                tokenBalance.style.display = 'none';
+                isConnected = false;
+            }
+        });
+
+        // FAQ toggle functionality
+        document.querySelectorAll('.faq-question').forEach(question => {
+            question.addEventListener('click', () => {
+                const faqItem = question.parentElement;
+                const answer = faqItem.querySelector('.faq-answer');
+                const toggle = question.querySelector('.faq-toggle');
+
+                faqItem.classList.toggle('active');
+                answer.classList.toggle('active');
+
+                if (faqItem.classList.contains('active')) {
+                    toggle.textContent = '−';
+                } else {
+                    toggle.textContent = '+';
+                }
+            });
+        });
+
+        // Scroll animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, observerOptions);
+
+        // Observe all animated elements
+        document.querySelectorAll('.fade-in, .slide-in-left, .slide-in-right').forEach(el => {
+            observer.observe(el);
+        });
+
+        // Progress bar animation
+        const progressBars = document.querySelectorAll('.progress-bar');
+        const progressObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const progressBar = entry.target;
+                    const width = progressBar.style.width;
+                    progressBar.style.width = '0%';
+                    setTimeout(() => {
+                        progressBar.style.width = width;
+                    }, 500);
+                }
+            });
+        }, observerOptions);
+
+        progressBars.forEach(bar => {
+            progressObserver.observe(bar);
+        });
+
+        // Mobile menu toggle
+        const mobileMenu = document.getElementById('mobileMenu');
+        const navLinks = document.querySelector('.nav-links');
+
+        mobileMenu.addEventListener('click', () => {
+            navLinks.classList.toggle('active');
+            mobileMenu.classList.toggle('active');
+        });
+
+        // Action button interactions
+        document.querySelectorAll('.action-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.preventDefault();
+                const originalText = btn.textContent;
+                btn.textContent = 'Processing...';
+                btn.disabled = true;
+
+                setTimeout(() => {
+                    btn.textContent = 'Completed!';
+                    btn.style.background = 'var(--ocean-blue)';
+
+                    setTimeout(() => {
+                        btn.textContent = originalText;
+                        btn.style.background = 'var(--primary-ocean)';
+                        btn.disabled = false;
+                    }, 2000);
+                }, 1500);
+            });
+        });
+
+        // Achievement hover effects
+        document.querySelectorAll('.achievement').forEach(achievement => {
+            achievement.addEventListener('click', () => {
+                if (!achievement.classList.contains('earned')) {
+                    achievement.style.transform = 'scale(0.95)';
+                    setTimeout(() => {
+                        achievement.style.transform = 'scale(1)';
+                    }, 150);
+                }
+            });
+        });
+
+        // Simplified stats counter animation (removed annoying spinning)
+        function animateCounter(element, target, duration = 2000) {
+            let start = 0;
+            const increment = target / (duration / 16);
+
+            function updateCounter() {
+                start += increment;
+                if (start < target) {
+                    element.textContent = Math.floor(start).toLocaleString();
+                    requestAnimationFrame(updateCounter);
+                } else {
+                    element.textContent = target.toLocaleString();
+                }
+            }
+
+            updateCounter();
+        }
+
+        // Animate hero stats when they come into view (only once)
+        const heroStatsObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const statNumbers = entry.target.querySelectorAll('.stat-number');
+                    statNumbers.forEach(stat => {
+                        const text = stat.textContent;
+                        const number = parseInt(text.replace(/[^\d]/g, ''));
+                        const suffix = text.replace(/[\d,]/g, '');
+
+                        animateCounter(stat, number);
+                        setTimeout(() => {
+                            stat.textContent = number.toLocaleString() + suffix;
+                        }, 2000);
+                    });
+                    heroStatsObserver.unobserve(entry.target);
+                }
+            });
+        }, observerOptions);
+
+        const heroStats = document.querySelector('.hero-stats');
+        if (heroStats) {
+            heroStatsObserver.observe(heroStats);
+        }
+    </script>
+
+</body>
+
+</html>

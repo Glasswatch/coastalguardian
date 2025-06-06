@@ -1,0 +1,1110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coastal Guardian | NFT Achievement Shop</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap">
+    
+    <style>
+        :root {
+            --primary-ocean: #0B4D68;
+            --deep-sea: #1B5E7A;
+            --ocean-blue: #2E86AB;
+            --sea-foam: #A8DADC;
+            --coral-reef: #F1FAEE;
+            --wave-crest: #E9F7F7;
+            --seafoam-green: #457B9D;
+            --tidal-pool: #1D3557;
+            --white: #FFFFFF;
+            --dark-text: #1D3557;
+            --medium-text: #457B9D;
+            --light-text: #2E86AB;
+            --warning: #F77F00;
+            --danger: #E63946;
+            --gradient-primary: linear-gradient(135deg, #1D3557 0%, #0B4D68 50%, #2E86AB 100%);
+            --gradient-secondary: linear-gradient(135deg, #A8DADC 0%, #F1FAEE 50%, #E9F7F7 100%);
+            --gradient-accent: linear-gradient(135deg, #457B9D 0%, #2E86AB 100%);
+            --gradient-ocean: linear-gradient(135deg, #0B4D68 0%, #1B5E7A 50%, #2E86AB 100%);
+            --gradient-wave: linear-gradient(135deg, #A8DADC 0%, #F1FAEE 100%);
+            --shadow-soft: 0 4px 20px rgba(29, 53, 87, 0.1);
+            --shadow-medium: 0 8px 30px rgba(29, 53, 87, 0.15);
+            --shadow-strong: 0 15px 40px rgba(29, 53, 87, 0.2);
+            --background: linear-gradient(135deg, #F1FAEE 0%, #E9F7F7 100%);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--background);
+            color: var(--dark-text);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* Navigation */
+        .navbar {
+            background: var(--gradient-primary);
+            color: white;
+            padding: 1rem 0;
+            position: relative;
+            overflow: hidden;
+            box-shadow: var(--shadow-medium);
+        }
+
+        .navbar::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 20"><path d="M0,10 Q25,0 50,10 T100,10 V20 H0 Z" fill="rgba(255,255,255,0.1)"/></svg>');
+            background-size: 200px 20px;
+            animation: wave 8s ease-in-out infinite;
+        }
+
+        @keyframes wave {
+            0%, 100% { transform: translateX(0); }
+            50% { transform: translateX(-100px); }
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+            z-index: 2;
+        }
+
+        .logo {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: white;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .logo::before {
+            content: '🌊';
+            font-size: 1.8rem;
+        }
+
+        .nav-actions {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .nav-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            cursor: pointer;
+        }
+
+        .nav-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-medium);
+        }
+
+        .nav-btn.logout {
+            background: rgba(231, 57, 70, 0.2);
+            border-color: rgba(231, 57, 70, 0.5);
+        }
+
+        .nav-btn.logout:hover {
+            background: rgba(231, 57, 70, 0.3);
+        }
+
+        /* Header Section */
+        .header-section {
+            padding: 4rem 0 2rem;
+            text-align: center;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        .page-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: clamp(2.5rem, 5vw, 4rem);
+            font-weight: 700;
+            color: var(--dark-text);
+            margin-bottom: 1rem;
+        }
+
+        .page-subtitle {
+            font-size: 1.2rem;
+            color: var(--medium-text);
+            max-width: 600px;
+            margin: 0 auto 2rem;
+        }
+
+        /* Token Balance */
+        .token-balance {
+            background: var(--gradient-ocean);
+            color: white;
+            padding: 2rem;
+            border-radius: 20px;
+            text-align: center;
+            margin: 2rem auto;
+            max-width: 400px;
+            box-shadow: var(--shadow-medium);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .token-balance::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 20"><path d="M0,10 Q25,0 50,10 T100,10 V20 H0 Z" fill="rgba(255,255,255,0.1)"/></svg>');
+            background-size: 150px 15px;
+            animation: wave 6s ease-in-out infinite reverse;
+        }
+
+        .balance-content {
+            position: relative;
+            z-index: 2;
+        }
+
+        .balance-label {
+            font-size: 1rem;
+            opacity: 0.9;
+            margin-bottom: 0.5rem;
+        }
+
+        .balance-amount {
+            font-size: 3rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .token-icon {
+            font-size: 2.5rem;
+        }
+
+        /* Filter Section */
+        .filter-section {
+            padding: 2rem 0;
+            text-align: center;
+        }
+
+        .filter-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            background: var(--gradient-wave);
+            border: 2px solid var(--sea-foam);
+            color: var(--dark-text);
+            padding: 0.75rem 1.5rem;
+            border-radius: 50px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .filter-btn:hover,
+        .filter-btn.active {
+            background: var(--gradient-accent);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-soft);
+        }
+
+        /* NFT Grid */
+        .nft-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+            padding: 2rem 0;
+        }
+
+        .nft-card {
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: var(--shadow-soft);
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .nft-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-medium);
+            border-color: var(--sea-foam);
+        }
+
+        .nft-card.owned {
+            border-color: var(--seafoam-green);
+            background: var(--gradient-wave);
+        }
+
+        .nft-image {
+            height: 250px;
+            background: var(--gradient-accent);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4rem;
+            color: white;
+            position: relative;
+        }
+
+        .nft-rarity {
+            position: absolute;
+            top: 1rem;
+            left: 1rem;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .nft-rarity.common { background: var(--medium-text); }
+        .nft-rarity.rare { background: var(--ocean-blue); }
+        .nft-rarity.epic { background: var(--primary-ocean); }
+        .nft-rarity.legendary { background: var(--gradient-primary); }
+
+        .soulbound-badge {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: var(--gradient-primary);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .owned-badge {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: 15px;
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+
+        .nft-content {
+            padding: 2rem;
+        }
+
+        .nft-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: var(--dark-text);
+            margin-bottom: 1rem;
+        }
+
+        .nft-description {
+            color: var(--medium-text);
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+        }
+
+        .nft-benefits {
+            background: var(--gradient-wave);
+            padding: 1rem;
+            border-radius: 10px;
+            margin-bottom: 1.5rem;
+        }
+
+        .nft-benefits h4 {
+            color: var(--dark-text);
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .benefit-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .benefit-list li {
+            color: var(--medium-text);
+            font-size: 0.85rem;
+            margin-bottom: 0.25rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .benefit-list li::before {
+            content: '✓';
+            color: var(--seafoam-green);
+            font-weight: bold;
+        }
+
+        .nft-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 1.5rem;
+        }
+
+        .nft-price {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--primary-ocean);
+        }
+
+        .purchase-btn {
+            background: var(--gradient-accent);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 50px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .purchase-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-medium);
+        }
+
+        .purchase-btn:disabled {
+            background: var(--sea-foam);
+            color: var(--medium-text);
+            cursor: not-allowed;
+        }
+
+        .purchase-btn.owned {
+            background: var(--seafoam-green);
+            cursor: default;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            backdrop-filter: blur(5px);
+        }
+
+        .modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 3rem;
+            border-radius: 20px;
+            max-width: 500px;
+            width: 90%;
+            text-align: center;
+            box-shadow: var(--shadow-strong);
+            position: relative;
+        }
+
+        .modal-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+        }
+
+        .modal-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--dark-text);
+            margin-bottom: 1rem;
+        }
+
+        .modal-text {
+            color: var(--medium-text);
+            margin-bottom: 2rem;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+        }
+
+        .modal-btn {
+            padding: 0.75rem 2rem;
+            border-radius: 50px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+        }
+
+        .modal-btn.primary {
+            background: var(--gradient-accent);
+            color: white;
+        }
+
+        .modal-btn.secondary {
+            background: var(--sea-foam);
+            color: var(--dark-text);
+        }
+
+        .modal-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-soft);
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--medium-text);
+        }
+
+        /* Success Animation */
+        .success-animation {
+            animation: successPulse 0.6s ease-out;
+        }
+
+        @keyframes successPulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        /* Loading State */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .nav-container {
+                flex-direction: column;
+                gap: 1rem;
+                text-align: center;
+            }
+
+            .nav-actions {
+                flex-direction: column;
+                width: 100%;
+            }
+
+            .nav-btn {
+                justify-content: center;
+            }
+
+            .nft-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .filter-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .nft-footer {
+                flex-direction: column;
+                gap: 1rem;
+                align-items: stretch;
+            }
+
+            .purchase-btn {
+                justify-content: center;
+            }
+
+            .modal-content {
+                padding: 2rem;
+                margin: 1rem;
+            }
+
+            .modal-actions {
+                flex-direction: column;
+            }
+        }
+
+        /* Animations */
+        .fade-in {
+            opacity: 0;
+            transform: translateY(30px);
+            animation: fadeInUp 0.8s ease forwards;
+        }
+
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .slide-in {
+            opacity: 0;
+            transform: translateX(-30px);
+            animation: slideIn 0.8s ease forwards;
+        }
+
+        @keyframes slideIn {
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="#" class="logo">Coastal Guardian Shop</a>
+            <div class="nav-actions">
+                <a href="#" class="nav-btn" onclick="returnToWelcome()">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M19 12H5M12 19l-7-7 7-7"/>
+                    </svg>
+                    Return to Welcome
+                </a>
+                <button class="nav-btn logout" onclick="logout()">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/>
+                    </svg>
+                    Logout
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Header Section -->
+    <section class="header-section">
+        <div class="container">
+            <h1 class="page-title fade-in">Achievement NFT Shop</h1>
+            <p class="page-subtitle fade-in">
+                Purchase soulbound NFTs that showcase your verified contributions to coastal conservation. 
+                These non-transferable tokens serve as permanent proof of your environmental impact.
+            </p>
+
+            <!-- Token Balance -->
+            <div class="token-balance fade-in">
+                <div class="balance-content">
+                    <div class="balance-label">Your Ocean Guardian Tokens</div>
+                    <div class="balance-amount">
+                        <span class="token-icon">🪙</span>
+                        <span id="userTokenBalance">247</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Filter Section -->
+    <section class="filter-section">
+        <div class="container">
+            <div class="filter-buttons">
+                <button class="filter-btn active" data-filter="all">All NFTs</button>
+                <button class="filter-btn" data-filter="cleanup">Beach Cleanup</button>
+                <button class="filter-btn" data-filter="restoration">Restoration</button>
+                <button class="filter-btn" data-filter="monitoring">Monitoring</button>
+                <button class="filter-btn" data-filter="education">Education</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- NFT Grid -->
+    <section class="nft-section">
+        <div class="container">
+            <div class="nft-grid" id="nftGrid">
+                <!-- NFT Cards will be populated by JavaScript -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Purchase Confirmation Modal -->
+    <div class="modal" id="purchaseModal">
+        <div class="modal-content">
+            <button class="close-modal" onclick="closeModal()">&times;</button>
+            <div class="modal-icon">🛒</div>
+            <h3 class="modal-title">Confirm Purchase</h3>
+            <p class="modal-text" id="modalText">
+                Are you sure you want to purchase this soulbound NFT? This action cannot be undone and the NFT will be permanently bound to your account.
+            </p>
+            <div class="modal-actions">
+                <button class="modal-btn primary" id="confirmPurchase">
+                    Confirm Purchase
+                </button>
+                <button class="modal-btn secondary" onclick="closeModal()">
+                    Cancel
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Success Modal -->
+    <div class="modal" id="successModal">
+        <div class="modal-content">
+            <button class="close-modal" onclick="closeModal()">&times;</button>
+            <div class="modal-icon">🎉</div>
+            <h3 class="modal-title">Purchase Successful!</h3>
+            <p class="modal-text">
+                Congratulations! Your soulbound NFT has been successfully minted and added to your collection. 
+                This achievement is now permanently recorded on the blockchain.
+            </p>
+            <div class="modal-actions">
+                <button class="modal-btn primary" onclick="closeModal()">
+                    Continue Shopping
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Error Modal -->
+    <div class="modal" id="errorModal">
+        <div class="modal-content">
+            <button class="close-modal" onclick="closeModal()">&times;</button>
+            <div class="modal-icon">❌</div>
+            <h3 class="modal-title">Purchase Failed</h3>
+            <p class="modal-text" id="errorText">
+                Insufficient tokens to complete this purchase. Participate in more coastal cleanup events to earn additional tokens.
+            </p>
+            <div class="modal-actions">
+                <button class="modal-btn primary" onclick="closeModal()">
+                    OK
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // User data (in a real app, this would come from a backend/blockchain)
+        let userData = {
+            tokenBalance: 247,
+            ownedNFTs: [1, 5] // NFT IDs that user already owns
+        };
+
+        // NFT data
+        const nftData = [
+            {
+                id: 1,
+                title: "Beach Cleanup Pioneer",
+                description: "Awarded for participating in your first coastal cleanup event. This NFT represents your initial commitment to ocean conservation.",
+                category: "cleanup",
+                rarity: "common",
+                price: 25,
+                emoji: "🏖️",
+                benefits: [
+                    "Verified first cleanup participation",
+                    "Access to beginner conservation resources",
+                    "Community recognition badge"
+                ]
+            },
+            {
+                id: 2,
+                title: "Coral Restoration Expert",
+                description: "Earned through active participation in coral reef restoration projects. Demonstrates hands-on marine ecosystem rehabilitation skills.",
+                category: "restoration",
+                rarity: "rare",
+                price: 75,
+                emoji: "🪸",
+                benefits: [
+                    "Certified coral restoration experience",
+                    "Marine biology skill verification",
+                    "Access to advanced restoration projects"
+                ]
+            },
+            {
+                id: 3,
+                title: "Marine Data Scientist",
+                description: "Awarded for contributing to marine monitoring and data collection efforts. Shows commitment to scientific conservation approaches.",
+                category: "monitoring",
+                rarity: "epic",
+                price: 150,
+                emoji: "🔬",
+                benefits: [
+                    "Scientific research participation proof",
+                    "Data analysis skill certification",
+                    "Research collaboration opportunities"
+                ]
+            },
+            {
+                id: 4,
+                title: "Ocean Ambassador",
+                description: "Recognizes leadership in community education and outreach programs. Demonstrates ability to inspire others in conservation efforts.",
+                category: "education",
+                rarity: "epic",
+                price: 120,
+                emoji: "🎓",
+                benefits: [
+                    "Community leadership verification",
+                    "Public speaking experience proof",
+                    "Educational program development skills"
+                ]
+            },
+            {
+                id: 5,
+                title: "Cleanup Champion",
+                description: "Earned by participating in 10+ beach cleanup events. Shows sustained commitment to coastal environmental protection.",
+                category: "cleanup",
+                rarity: "rare",
+                price: 100,
+                emoji: "🏆",
+                benefits: [
+                    "Sustained volunteer commitment proof",
+                    "Environmental leadership demonstration",
+                    "Community impact verification"
+                ]
+            },
+            {
+                id: 6,
+                title: "Mangrove Guardian",
+                description: "Awarded for participating in mangrove restoration and protection initiatives. Demonstrates understanding of coastal ecosystem importance.",
+                category: "restoration",
+                rarity: "rare",
+                price: 85,
+                emoji: "🌿",
+                benefits: [
+                    "Ecosystem restoration expertise",
+                    "Coastal protection knowledge",
+                    "Biodiversity conservation skills"
+                ]
+            },
+            {
+                id: 7,
+                title: "Sea Turtle Protector",
+                description: "Earned through participation in sea turtle conservation programs. Shows dedication to protecting endangered marine species.",
+                category: "monitoring",
+                rarity: "epic",
+                price: 200,
+                emoji: "🐢",
+                benefits: [
+                    "Endangered species protection experience",
+                    "Wildlife conservation certification",
+                    "Marine biology field experience"
+                ]
+            },
+            {
+                id: 8,
+                title: "Plastic-Free Advocate",
+                description: "Recognizes efforts in promoting plastic-free initiatives and sustainable alternatives. Demonstrates commitment to pollution reduction.",
+                category: "education",
+                rarity: "common",
+                price: 40,
+                emoji: "♻️",
+                benefits: [
+                    "Sustainability advocacy proof",
+                    "Pollution reduction initiative experience",
+                    "Community awareness campaign skills"
+                ]
+            },
+            {
+                id: 9,
+                title: "Ocean Conservation Legend",
+                description: "The ultimate achievement for exceptional contributions to coastal conservation. Reserved for the most dedicated ocean guardians.",
+                category: "cleanup",
+                rarity: "legendary",
+                price: 500,
+                emoji: "🌊",
+                benefits: [
+                    "Exceptional conservation impact verification",
+                    "Leadership in environmental protection",
+                    "Lifetime achievement recognition",
+                    "Exclusive access to premium conservation programs"
+                ]
+            }
+        ];
+
+        let currentFilter = 'all';
+        let selectedNFT = null;
+
+        // Initialize the page
+        document.addEventListener('DOMContentLoaded', function() {
+            updateTokenBalance();
+            renderNFTs();
+            setupEventListeners();
+            
+            // Add animation delays
+            const elements = document.querySelectorAll('.fade-in, .slide-in');
+            elements.forEach((el, index) => {
+                el.style.animationDelay = `${index * 0.1}s`;
+            });
+        });
+
+        function updateTokenBalance() {
+            document.getElementById('userTokenBalance').textContent = userData.tokenBalance;
+        }
+
+        function renderNFTs() {
+            const grid = document.getElementById('nftGrid');
+            const filteredNFTs = currentFilter === 'all' 
+                ? nftData 
+                : nftData.filter(nft => nft.category === currentFilter);
+
+            grid.innerHTML = filteredNFTs.map(nft => {
+                const isOwned = userData.ownedNFTs.includes(nft.id);
+                const canAfford = userData.tokenBalance >= nft.price;
+                
+                return `
+                    <div class="nft-card ${isOwned ? 'owned' : ''} fade-in">
+                        <div class="nft-image">
+                            ${nft.emoji}
+                            <div class="nft-rarity ${nft.rarity}">${nft.rarity.toUpperCase()}</div>
+                            <div class="soulbound-badge">
+                                🔒 Soulbound
+                            </div>
+                            ${isOwned ? '<div class="owned-badge">✓ OWNED</div>' : ''}
+                        </div>
+                        <div class="nft-content">
+                            <h3 class="nft-title">${nft.title}</h3>
+                            <p class="nft-description">${nft.description}</p>
+                            
+                            <div class="nft-benefits">
+                                <h4>Resume Benefits:</h4>
+                                <ul class="benefit-list">
+                                    ${nft.benefits.map(benefit => `<li>${benefit}</li>`).join('')}
+                                </ul>
+                            </div>
+                            
+                            <div class="nft-footer">
+                                <div class="nft-price">
+                                    <span class="token-icon">🪙</span>
+                                    <span>${nft.price} Tokens</span>
+                                </div>
+                                <button 
+                                    class="purchase-btn ${isOwned ? 'owned' : ''}" 
+                                    ${isOwned ? 'disabled' : ''}
+                                    ${!canAfford && !isOwned ? 'disabled' : ''}
+                                    onclick="${isOwned ? '' : `purchaseNFT(${nft.id})`}"
+                                >
+                                    ${isOwned ? '✓ Owned' : !canAfford ? 'Insufficient Tokens' : 'Purchase NFT'}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            // Re-apply animations
+            const newElements = grid.querySelectorAll('.fade-in');
+            newElements.forEach((el, index) => {
+                el.style.animationDelay = `${index * 0.1}s`;
+            });
+        }
+
+        function setupEventListeners() {
+            // Filter buttons
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    currentFilter = this.dataset.filter;
+                    renderNFTs();
+                });
+            });
+
+            // Purchase confirmation
+            document.getElementById('confirmPurchase').addEventListener('click', function() {
+                if (selectedNFT) {
+                    processPurchase(selectedNFT);
+                }
+            });
+        }
+
+        function purchaseNFT(nftId) {
+            const nft = nftData.find(n => n.id === nftId);
+            if (!nft) return;
+
+            if (userData.tokenBalance < nft.price) {
+                showErrorModal('Insufficient tokens to complete this purchase. Participate in more coastal cleanup events to earn additional tokens.');
+                return;
+            }
+
+            selectedNFT = nft;
+            document.getElementById('modalText').textContent = 
+                `Are you sure you want to purchase "${nft.title}" for ${nft.price} tokens? This soulbound NFT will be permanently bound to your account and cannot be transferred.`;
+            
+            showModal('purchaseModal');
+        }
+
+        function processPurchase(nft) {
+            const confirmBtn = document.getElementById('confirmPurchase');
+            const originalText = confirmBtn.textContent;
+            
+            // Show loading state
+            confirmBtn.innerHTML = '<div class="loading"></div> Processing...';
+            confirmBtn.disabled = true;
+
+            // Simulate blockchain transaction
+            setTimeout(() => {
+                // Deduct tokens
+                userData.tokenBalance -= nft.price;
+                
+                // Add NFT to owned collection
+                userData.ownedNFTs.push(nft.id);
+                
+                // Update UI
+                updateTokenBalance();
+                renderNFTs();
+                
+                // Reset button
+                confirmBtn.textContent = originalText;
+                confirmBtn.disabled = false;
+                
+                // Close purchase modal and show success
+                closeModal();
+                showModal('successModal');
+                
+                // Add success animation to token balance
+                document.querySelector('.token-balance').classList.add('success-animation');
+                setTimeout(() => {
+                    document.querySelector('.token-balance').classList.remove('success-animation');
+                }, 600);
+                
+            }, 2000); // Simulate 2-second transaction time
+        }
+
+        function showModal(modalId) {
+            document.getElementById(modalId).classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal() {
+            document.querySelectorAll('.modal').forEach(modal => {
+                modal.classList.remove('active');
+            });
+            document.body.style.overflow = 'auto';
+            selectedNFT = null;
+        }
+
+        function showErrorModal(message) {
+            document.getElementById('errorText').textContent = message;
+            showModal('errorModal');
+        }
+
+        function returnToWelcome() {
+            // Add loading state
+            const btn = event.target.closest('.nav-btn');
+            const originalContent = btn.innerHTML;
+            btn.innerHTML = '<div class="loading"></div> Returning...';
+            
+            setTimeout(() => {
+                btn.innerHTML = originalContent;
+                window.location.href ='dashboard.html'
+            }, 1500);
+        }
+
+        function logout() {
+            const btn = event.target.closest('.nav-btn');
+            const originalContent = btn.innerHTML;
+            btn.innerHTML = '<div class="loading"></div> Logging out...';
+            
+            setTimeout(() => {
+                if (confirm('Are you sure you want to logout? You will need to reconnect your wallet to access your NFTs again.')) {
+                    window.location.href ='../index.html'
+                }
+                btn.innerHTML = originalContent;
+                
+            }, 1000);
+        }
+
+        // Close modal when clicking outside
+        document.querySelectorAll('.modal').forEach(modal => {
+            modal.addEventListener('click', function(e) {
+                if (e.target === this) {
+                    closeModal();
+                }
+            });
+        });
+
+        // Keyboard navigation
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeModal();
+            }
+        });
+
+        // Intersection Observer for animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.animationPlayState = 'running';
+                }
+            });
+        }, observerOptions);
+
+        // Observe animated elements
+        document.querySelectorAll('.fade-in, .slide-in').forEach(el => {
+            el.style.animationPlayState = 'paused';
+            observer.observe(el);
+        });
+    </script>
+</body>
+</html>

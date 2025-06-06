@@ -1,0 +1,1740 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coastal Guardian - Pangasinan Conservation Map</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    
+    <!-- Leaflet MarkerCluster CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.Default.css" />
+    
+    <style>
+        :root {
+            --primary-deep: #0a4c6e;
+            --primary-ocean: #1a6b8f;
+            --secondary-blue: #2d8bbd;
+            --accent-wave: #4ab4d6;
+            --accent-foam: #6dd0e0;
+            --neutral-sea: #8fe3f0;
+            --light-aqua: #b3f0ff;
+            --background: #d6f7ff;
+            --white: #FFFFFF;
+            --dark-text: #042a37;
+            --medium-text: #35a8cd;
+            --light-text: #4ab4d6;
+            --warning: #FFA500;
+            --danger: #E63946;
+            --gradient-primary: linear-gradient(135deg, #0a4c6e 0%, #1a6b8f 50%, #2d8bbd 100%);
+            --gradient-secondary: linear-gradient(135deg, #4ab4d6 0%, #6dd0e0 50%, #8fe3f0 100%);
+            --gradient-accent: linear-gradient(135deg, #2d8bbd 0%, #4ab4d6 100%);
+            --shadow-soft: 0 4px 20px rgba(4, 42, 55, 0.1);
+            --shadow-medium: 0 8px 30px rgba(4, 42, 55, 0.15);
+            --shadow-strong: 0 15px 40px rgba(4, 42, 55, 0.2);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--background);
+            color: var(--dark-text);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* Header */
+        .header {
+            background: var(--gradient-primary);
+            color: white;
+            padding: 1rem 0;
+            position: relative;
+            overflow: hidden;
+            z-index: 1000;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 20"><path d="M0,10 Q25,0 50,10 T100,10 V20 H0 Z" fill="rgba(255,255,255,0.1)"/></svg>');
+            background-size: 200px 20px;
+            animation: wave 8s ease-in-out infinite;
+        }
+
+        @keyframes wave {
+            0%, 100% { transform: translateX(0); }
+            50% { transform: translateX(-100px); }
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+            z-index: 2;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--gradient-secondary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .return-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .return-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-medium);
+        }
+
+        /* Main Container */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+            display: grid;
+            grid-template-columns: 1fr 400px;
+            gap: 2rem;
+            min-height: calc(100vh - 120px);
+        }
+
+        /* Map Section */
+        .map-section {
+            background: white;
+            border-radius: 20px;
+            box-shadow: var(--shadow-medium);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .map-header {
+            background: var(--gradient-accent);
+            color: white;
+            padding: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .map-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .map-stats {
+            display: flex;
+            gap: 1rem;
+            font-size: 0.9rem;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-number {
+            display: block;
+            font-weight: 700;
+            font-size: 1.2rem;
+        }
+
+        /* Leaflet Map Container */
+        .map-container {
+            position: relative;
+            height: 600px;
+            overflow: hidden;
+        }
+
+        #map {
+            height: 100%;
+            width: 100%;
+            z-index: 1;
+        }
+
+        /* Custom Leaflet Controls */
+        .leaflet-control-container .leaflet-top.leaflet-right {
+            top: 20px;
+            right: 20px;
+        }
+
+        .leaflet-control-zoom {
+            border: none !important;
+            box-shadow: var(--shadow-soft) !important;
+        }
+
+        .leaflet-control-zoom a {
+            background: white !important;
+            color: var(--primary-deep) !important;
+            border: none !important;
+            font-weight: bold !important;
+            transition: all 0.3s ease !important;
+        }
+
+        .leaflet-control-zoom a:hover {
+            background: var(--background) !important;
+            transform: translateY(-2px);
+        }
+
+        /* Custom Marker Styles */
+        .custom-marker {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            border: 3px solid white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow-strong);
+            position: relative;
+        }
+
+        .custom-marker:hover {
+            transform: scale(1.2);
+            z-index: 1000;
+        }
+
+        .custom-marker.active {
+            transform: scale(1.3);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(255, 165, 0, 0.7); }
+            50% { box-shadow: 0 0 0 20px rgba(255, 165, 0, 0); }
+        }
+
+        .marker-cleanup {
+            background: linear-gradient(135deg, #4ab4d6 0%, #6dd0e0 100%);
+        }
+
+        .marker-restoration {
+            background: linear-gradient(135deg, #0a4c6e 0%, #2d8bbd 100%);
+        }
+
+        .marker-monitoring {
+            background: linear-gradient(135deg, #2d8bbd 0%, #4ab4d6 100%);
+        }
+
+        .marker-education {
+            background: linear-gradient(135deg, #4ab4d6 0%, #8fe3f0 100%);
+        }
+
+        /* Custom Popup Styles */
+        .leaflet-popup-content-wrapper {
+            background: white;
+            border-radius: 15px;
+            box-shadow: var(--shadow-medium);
+            border: 2px solid var(--accent-wave);
+        }
+
+        .leaflet-popup-content {
+            margin: 15px;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .popup-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .popup-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            color: white;
+        }
+
+        .popup-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--dark-text);
+            margin: 0;
+        }
+
+        .popup-location {
+            color: var(--medium-text);
+            font-size: 0.85rem;
+            margin: 0;
+        }
+
+        .popup-meta {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.5rem;
+            margin: 0.75rem 0;
+        }
+
+        .popup-meta-item {
+            background: var(--background);
+            padding: 0.5rem;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 0.8rem;
+        }
+
+        .popup-meta-label {
+            color: var(--medium-text);
+            font-size: 0.7rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .popup-meta-value {
+            font-weight: 600;
+            color: var(--dark-text);
+        }
+
+        .popup-btn {
+            background: var(--gradient-accent);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            margin-top: 0.5rem;
+        }
+
+        .popup-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-soft);
+        }
+
+        /* Map Controls Panel */
+        .map-controls-panel {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 12px;
+            padding: 1rem;
+            box-shadow: var(--shadow-soft);
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(75, 180, 214, 0.3);
+        }
+
+        .controls-title {
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+            color: var(--dark-text);
+            font-size: 0.9rem;
+        }
+
+        .control-btn {
+            background: var(--background);
+            border: 1px solid var(--accent-wave);
+            color: var(--dark-text);
+            padding: 0.5rem 0.75rem;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 0.25rem;
+            display: inline-block;
+        }
+
+        .control-btn:hover,
+        .control-btn.active {
+            background: var(--accent-wave);
+            color: white;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .filter-panel {
+            background: white;
+            border-radius: 20px;
+            padding: 1.5rem;
+            box-shadow: var(--shadow-soft);
+        }
+
+        .filter-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--dark-text);
+            margin-bottom: 1rem;
+        }
+
+        .filter-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .filter-btn {
+            background: var(--background);
+            border: 2px solid var(--accent-wave);
+            color: var(--dark-text);
+            padding: 0.75rem 1rem;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .filter-btn:hover,
+        .filter-btn.active {
+            background: var(--gradient-accent);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-soft);
+        }
+
+        .event-details {
+            background: white;
+            border-radius: 20px;
+            padding: 1.5rem;
+            box-shadow: var(--shadow-soft);
+            min-height: 400px;
+        }
+
+        .event-placeholder {
+            text-align: center;
+            color: var(--medium-text);
+            padding: 2rem;
+        }
+
+        .event-placeholder-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+
+        .event-card {
+            display: none;
+        }
+
+        .event-card.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .event-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .event-icon {
+            width: 60px;
+            height: 60px;
+            background: var(--gradient-accent);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: white;
+        }
+
+        .event-info h3 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--dark-text);
+            margin-bottom: 0.25rem;
+        }
+
+        .event-location {
+            color: var(--medium-text);
+            font-size: 0.9rem;
+        }
+
+        .event-meta {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .meta-item {
+            background: var(--background);
+            padding: 1rem;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .meta-label {
+            font-size: 0.8rem;
+            color: var(--medium-text);
+            margin-bottom: 0.25rem;
+        }
+
+        .meta-value {
+            font-weight: 600;
+            color: var(--dark-text);
+        }
+
+        .event-description {
+            color: var(--dark-text);
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+        }
+
+        .event-actions {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 50px;
+            font-weight: 600;
+            text-decoration: none;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background: var(--gradient-accent);
+            color: white;
+            flex: 1;
+            justify-content: center;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-medium);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--medium-text);
+            border: 2px solid var(--accent-wave);
+        }
+
+        .btn-secondary:hover {
+            background: var(--accent-wave);
+            color: white;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+            .container {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+
+            .sidebar {
+                order: -1;
+            }
+
+            .filter-buttons {
+                flex-direction: row;
+                flex-wrap: wrap;
+            }
+
+            .filter-btn {
+                flex: 1;
+                min-width: 120px;
+            }
+
+            .map-controls-panel {
+                position: relative;
+                top: auto;
+                left: auto;
+                margin-bottom: 1rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+
+            .header-content {
+                padding: 0 1rem;
+                flex-direction: column;
+                gap: 1rem;
+                text-align: center;
+            }
+
+            .map-container {
+                height: 400px;
+            }
+
+            .map-header {
+                flex-direction: column;
+                gap: 1rem;
+                text-align: center;
+            }
+
+            .map-stats {
+                justify-content: center;
+            }
+
+            .event-meta {
+                grid-template-columns: 1fr;
+            }
+
+            .event-actions {
+                flex-direction: column;
+            }
+
+            .custom-marker {
+                width: 35px;
+                height: 35px;
+                font-size: 1.1rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .custom-marker {
+                width: 30px;
+                height: 30px;
+                font-size: 1rem;
+            }
+
+            .filter-buttons {
+                flex-direction: column;
+            }
+
+            .return-btn {
+                padding: 0.5rem 1rem;
+                font-size: 0.9rem;
+            }
+        }
+
+        /* Loading Animation */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Custom Cluster Styles */
+        .marker-cluster-small {
+            background-color: rgba(75, 180, 214, 0.6);
+        }
+        .marker-cluster-small div {
+            background-color: rgba(75, 180, 214, 0.8);
+        }
+
+        .marker-cluster-medium {
+            background-color: rgba(45, 139, 189, 0.6);
+        }
+        .marker-cluster-medium div {
+            background-color: rgba(45, 139, 189, 0.8);
+        }
+
+        .marker-cluster-large {
+            background-color: rgba(10, 76, 110, 0.6);
+        }
+        .marker-cluster-large div {
+            background-color: rgba(10, 76, 110, 0.8);
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <div class="logo">
+                <div class="logo-icon">🌊</div>
+                <span>Coastal Guardian</span>
+            </div>
+            <a href="#" class="return-btn" onclick="returnToWelcome()">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M19 12H5M12 19l-7-7 7-7"/>
+                </svg>
+                Return to Welcome
+            </a>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <div class="container">
+        <!-- Map Section -->
+        <div class="map-section">
+            <div class="map-header">
+                <div>
+                    <h2 class="map-title">Pangasinan Conservation Events</h2>
+                    <p>Interactive map with real geographic coordinates</p>
+                </div>
+                <div class="map-stats">
+                    <div class="stat-item">
+                        <span class="stat-number" id="totalEvents">12</span>
+                        <span>Active Events</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number" id="totalParticipants">847</span>
+                        <span>Participants</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="map-container">
+                <!-- Map Controls Panel -->
+                <div class="map-controls-panel">
+                    <div class="controls-title">Quick Actions</div>
+                    <button class="control-btn" onclick="centerOnPangasinan()">📍 Center Pangasinan</button>
+                    <button class="control-btn" onclick="showAllEvents()">🌊 Show All Events</button>
+                    <button class="control-btn" onclick="toggleSatellite()">🛰️ Toggle Satellite</button>
+                </div>
+
+                <!-- Leaflet Map -->
+                <div id="map"></div>
+            </div>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <!-- Filter Panel -->
+            <div class="filter-panel">
+                <h3 class="filter-title">Event Filters</h3>
+                <div class="filter-buttons">
+                    <button class="filter-btn active" data-filter="all">
+                        🌊 All Events
+                    </button>
+                    <button class="filter-btn" data-filter="cleanup">
+                        🧹 Beach Cleanups
+                    </button>
+                    <button class="filter-btn" data-filter="restoration">
+                        🪸 Restoration
+                    </button>
+                    <button class="filter-btn" data-filter="monitoring">
+                        🔬 Monitoring
+                    </button>
+                    <button class="filter-btn" data-filter="education">
+                        📚 Education
+                    </button>
+                </div>
+            </div>
+
+            <!-- Event Details -->
+            <div class="event-details">
+                <div class="event-placeholder" id="eventPlaceholder">
+                    <div class="event-placeholder-icon">🗺️</div>
+                    <h3>Select an Event</h3>
+                    <p>Click on any marker on the map to view event details and join conservation efforts. Zoom in to see precise locations!</p>
+                </div>
+
+                <!-- Event Cards -->
+                <div class="event-card" id="event-1">
+                    <div class="event-header">
+                        <div class="event-icon">🧹</div>
+                        <div class="event-info">
+                            <h3>Lingayen Beach Cleanup</h3>
+                            <div class="event-location">📍 Lingayen Gulf, Pangasinan (16.0194°N, 120.2298°E)</div>
+                        </div>
+                    </div>
+                    <div class="event-meta">
+                        <div class="meta-item">
+                            <div class="meta-label">Date</div>
+                            <div class="meta-value">Dec 15, 2024</div>
+                        </div>
+                        <div class="meta-item">
+                            <div class="meta-label">Participants</div>
+                            <div class="meta-value">45 / 60</div>
+                        </div>
+                        <div class="meta-item">
+                            <div class="meta-label">Duration</div>
+                            <div class="meta-value">4 hours</div>
+                        </div>
+                        <div class="meta-item">
+                            <div class="meta-label">SBT Reward</div>
+                            <div class="meta-value">15 tokens</div>
+                        </div>
+                    </div>
+                    <div class="event-description">
+                        Join our community cleanup effort at Lingayen Beach, the historic landing site in WWII. Help remove plastic waste and debris from this culturally significant coastline while earning soulbound tokens.
+                    </div>
+                    <div class="event-actions">
+                        <button class="btn btn-primary" onclick="joinEvent(1)">
+                            Join Event
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M5 12h14M12 5l7 7-7 7"/>
+                            </svg>
+                        </button>
+                        <button class="btn btn-secondary">Share</button>
+                    </div>
+                </div>
+
+                <div class="event-card" id="event-2">
+                    <div class="event-header">
+                        <div class="event-icon">🪸</div>
+                        <div class="event-info">
+                            <h3>Alaminos Coral Restoration</h3>
+                            <div class="event-location">📍 Alaminos Marine Sanctuary (16.1572°N, 119.9908°E)</div>
+                        </div>
+                    </div>
+                    <div class="event-meta">
+                        <div class="meta-item">
+                            <div class="meta-label">Date</div>
+                            <div class="meta-value">Dec 18, 2024</div>
+                        </div>
+                        <div class="meta-item">
+                            <div class="meta-label">Participants</div>
+                            <div class="meta-value">12 / 20</div>
+                        </div>
+                        <div class="meta-item">
+                            <div class="meta-label">Duration</div>
+                            <div class="meta-value">6 hours</div>
+                        </div>
+                        <div class="meta-item">
+                            <div class="meta-label">SBT Reward</div>
+                            <div class="meta-value">25 tokens</div>
+                        </div>
+                    </div>
+                    <div class="event-description">
+                        Participate in coral restoration near the famous Hundred Islands. Learn coral biology, transplantation techniques, and help rebuild damaged reef ecosystems in Alaminos Bay. Diving certification required.
+                    </div>
+                    <div class="event-actions">
+                        <button class="btn btn-primary" onclick="joinEvent(2)">
+                            Join Event
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M5 12h14M12 5l7 7-7 7"/>
+                            </svg>
+                        </button>
+                        <button class="btn btn-secondary">Share</button>
+                    </div>
+                </div>
+
+                <div class="event-card" id="event-3">
+                    <div class="event-header">
+                        <div class="event-icon">🔬</div>
+                        <div class="event-info">
+                            <h3>Hundred Islands Marine Monitoring</h3>
+                            <div class="event-location">📍 Hundred Islands National Park (16.1943°N, 119.9344°E)</div>
+                        </div>
+                    </div>
+                    <div class="event-meta">
+                        <div class="meta-item">
+                            <div class="meta-label">Date</div>
+                            <div class="meta-value">Dec 20, 2024</div>
+                        </div>
+                        <div class="meta-item">
+                            <div class="meta-label">Participants</div>
+                            <div class="meta-value">8 / 15</div>
+                        </div>
+                        <div class="meta-item">
+                            <div class="meta-label">Duration</div>
+                            <div class="meta-value">8 hours</div>
+                        </div>
+                        <div class="meta-item">
+                            <div class="meta-label">SBT Reward</div>
+                            <div class="meta-value">30 tokens</div>
+                        </div>
+                    </div>
+                    <div class="event-description">
+                        Conduct scientific monitoring of marine biodiversity in the Philippines' first national park. Record fish populations, coral health, and water quality data around these pristine 123 islands and islets.
+                    </div>
+                    <div class="event-actions">
+                        <button class="btn btn-primary" onclick="joinEvent(3)">
+                            Join Event
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M5 12h14M12 5l7 7-7 7"/>
+                            </svg>
+                        </button>
+                        <button class="btn btn-secondary">Share</button>
+                    </div>
+                </div>
+
+                <div class="event-card" id="event-4">
+                    <div class="event-header">
+                        <div class="event-icon">📚</div>
+                        <div class="event-info">
+                            <h3>Dagupan Conservation Workshop</h3>
+                            <div class="event-location">📍 Dagupan Community Center (15.9759°N, 120.3370°E)</div>
+                        </div>
+                    </div>
+                    <div class="event-meta">
+                        <div class="meta-item">
+                            <div class="meta-label">Date</div>
+                            <div class="meta-value">Dec 22, 2024</div>
+                        </div>
+                        <div class="meta-item">
+                            <div class="meta-label">Participants</div>
+                            <div class="meta-value">35 / 50</div>
+                        </div>
+                        <div class="meta-item">
+                            <div class="meta-label">Duration</div>
+                            <div class="meta-value">3 hours</div>
+                        </div>
+                        <div class="meta-item">
+                            <div class="meta-label">SBT Reward</div>
+                            <div class="meta-value">10 tokens</div>
+                        </div>
+                    </div>
+                    <div class="event-description">
+                        Educational workshop in Dagupan, the "Bangus Capital of the World". Learn about marine ecosystem protection, sustainable milkfish farming, and climate change impacts on fisheries.
+                    </div>
+                    <div class="event-actions">
+                        <button class="btn btn-primary" onclick="joinEvent(4)">
+                            Join Event
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M5 12h14M12 5l7 7-7 7"/>
+                            </svg>
+                        </button>
+                        <button class="btn btn-secondary">Share</button>
+                    </div>
+                </div>
+
+                <div class="event-card" id="event-5">
+                    <div class="event-header">
+                        <div class="event-icon">🌿</div>
+                        <div class="event-info">
+                            <h3>Bolinao Mangrove Restoration</h3>
+                            <div class="event-location">📍 Bolinao Peninsula (16.3831°N, 119.8867°E)</div>
+                        </div>
+                    </div>
+                    <div class="event-meta">
+                        <div class="meta-item">
+                            <div class="meta-label">Date</div>
+                            <div class="meta-value">Dec 25, 2024</div>
+                        </div>
+                        <div class="meta-item">
+                            <div class="meta-label">Participants</div>
+                            <div class="meta-value">28 / 40</div>
+                        </div>
+                        <div class="meta-item">
+                            <div class="meta-label">Duration</div>
+                            <div class="meta-value">5 hours</div>
+                        </div>
+                        <div class="meta-item">
+                            <div class="meta-label">SBT Reward</div>
+                            <div class="meta-value">20 tokens</div>
+                        </div>
+                    </div>
+                    <div class="event-description">
+                        Plant mangrove seedlings at Bolinao's western peninsula tip. Learn about the crucial role of mangroves in coastal protection, carbon sequestration, and marine nursery habitat in this famous marine station area.
+                    </div>
+                    <div class="event-actions">
+                        <button class="btn btn-primary" onclick="joinEvent(5)">
+                            Join Event
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M5 12h14M12 5l7 7-7 7"/>
+                            </svg>
+                        </button>
+                        <button class="btn btn-secondary">Share</button>
+                    </div>
+                </div>
+
+                <div class="event-card" id="event-6">
+                    <div class="event-header">
+                        <div class="event-icon">🐠</div>
+                        <div class="event-info">
+                            <h3>San Carlos Reef Survey</h3>
+                            <div class="event-location">📍 San Carlos Marine Reserve (15.9315°N, 120.3417°E)</div>
+                        </div>
+                    </div>
+                    <div class="event-meta">
+                        <div class="meta-item">
+                            <div class="meta-label">Date</div>
+                            <div class="meta-value">Dec 28, 2024</div>
+                        </div>
+                        <div class="meta-item">
+                            <div class="meta-label">Participants</div>
+                            <div class="meta-value">15 / 25</div>
+                        </div>
+                        <div class="meta-item">
+                            <div class="meta-label">Duration</div>
+                            <div class="meta-value">6 hours</div>
+                        </div>
+                        <div class="meta-item">
+                            <div class="meta-label">SBT Reward</div>
+                            <div class="meta-value">25 tokens</div>
+                        </div>
+                    </div>
+                    <div class="event-description">
+                        Underwater fish population survey in San Carlos coastal waters. Help document marine biodiversity and assess reef health indicators in this important fishing municipality.
+                    </div>
+                    <div class="event-actions">
+                        <button class="btn btn-primary" onclick="joinEvent(6)">
+                            Join Event
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M5 12h14M12 5l7 7-7 7"/>
+                            </svg>
+                        </button>
+                        <button class="btn btn-secondary">Share</button>
+                    </div>
+                </div>
+
+                <div class="event-card" id="event-7">
+                    <div class="event-header">
+                        <div class="event-icon">💧</div>
+                        <div class="event-info">
+                            <h3>Anda Water Quality Assessment</h3>
+                            <div class="event-location">📍 Anda Coastal Waters (16.2642°N, 119.9908°E)</div>
+                        </div>
+                    </div>
+                    <div class="event-meta">
+                        <div class="meta-item">
+                            <div class="meta-label">Date</div>
+                            <div class="meta-value">Jan 2, 2025</div>
+                        </div>
+                        <div class="meta-item">
+                            <div class="meta-label">Participants</div>
+                            <div class="meta-value">20 / 30</div>
+                        </div>
+                        <div class="meta-item">
+                            <div class="meta-label">Duration</div>
+                            <div class="meta-value">4 hours</div>
+                        </div>
+                        <div class="meta-item">
+                            <div class="meta-label">SBT Reward</div>
+                            <div class="meta-value">18 tokens</div>
+                        </div>
+                    </div>
+                    <div class="event-description">
+                        Conduct comprehensive water quality testing in Anda's pristine beaches. Learn to use professional equipment for pH, dissolved oxygen, turbidity, and nutrient analysis in this emerging eco-tourism destination.
+                    </div>
+                    <div class="event-actions">
+                        <button class="btn btn-primary" onclick="joinEvent(7)">
+                            Join Event
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M5 12h14M12 5l7 7-7 7"/>
+                            </svg>
+                        </button>
+                        <button class="btn btn-secondary">Share</button>
+                    </div>
+                </div>
+
+                <div class="event-card" id="event-8">
+                    <div class="event-header">
+                        <div class="event-icon">👥</div>
+                        <div class="event-info">
+                            <h3>Bani Community Outreach</h3>
+                            <div class="event-location">📍 Bani Municipal Hall (16.1936°N, 119.8344°E)</div>
+                        </div>
+                    </div>
+                    <div class="event-meta">
+                        <div class="meta-item">
+                            <div class="meta-label">Date</div>
+                            <div class="meta-value">Jan 5, 2025</div>
+                        </div>
+                        <div class="meta-item">
+                            <div class="meta-label">Participants</div>
+                            <div class="meta-value">42 / 60</div>
+                        </div>
+                        <div class="meta-item">
+                            <div class="meta-label">Duration</div>
+                            <div class="meta-value">6 hours</div>
+                        </div>
+                        <div class="meta-item">
+                            <div class="meta-label">SBT Reward</div>
+                            <div class="meta-value">12 tokens</div>
+                        </div>
+                    </div>
+                    <div class="event-description">
+                        Engage with Bani's fishing communities to promote sustainable practices. This coastal municipality is known for its rich marine resources - help educate and gather feedback on conservation initiatives.
+                    </div>
+                    <div class="event-actions">
+                        <button class="btn btn-primary" onclick="joinEvent(8)">
+                            Join Event
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M5 12h14M12 5l7 7-7 7"/>
+                            </svg>
+                        </button>
+                        <button class="btn btn-secondary">Share</button>
+                    </div>
+                </div>
+
+                <div class="event-card" id="event-9">
+                    <div class="event-header">
+                        <div class="event-icon">🏖️</div>
+                        <div class="event-info">
+                            <h3>Labrador Beach Cleanup</h3>
+                            <div class="event-location">📍 Labrador Beach (15.8789°N, 120.1167°E)</div>
+                        </div>
+                    </div>
+                    <div class="event-meta">
+                        <div class="meta-item">
+                            <div class="meta-label">Date</div>
+                            <div class="meta-value">Jan 8, 2025</div>
+                        </div>
+                        <div class="meta-item">
+                            <div class="meta-label">Participants</div>
+                            <div class="meta-value">38 / 50</div>
+                        </div>
+                        <div class="meta-item">
+                            <div class="meta-label">Duration</div>
+                            <div class="meta-value">5 hours</div>
+                        </div>
+                        <div class="meta-item">
+                            <div class="meta-label">SBT Reward</div>
+                            <div class="meta-value">16 tokens</div>
+                        </div>
+                    </div>
+                    <div class="event-description">
+                        Large-scale beach cleanup in Labrador's extensive coastline. Focus on microplastics and marine debris affecting this important fishing municipality's beautiful beaches.
+                    </div>
+                    <div class="event-actions">
+                        <button class="btn btn-primary" onclick="joinEvent(9)">
+                            Join Event
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M5 12h14M12 5l7 7-7 7"/>
+                            </svg>
+                        </button>
+                        <button class="btn btn-secondary">Share</button>
+                    </div>
+                </div>
+
+                <div class="event-card" id="event-10">
+                    <div class="event-header">
+                        <div class="event-icon">🌱</div>
+                        <div class="event-info">
+                            <h3>Infanta Seagrass Restoration</h3>
+                            <div class="event-location">📍 Infanta Marine Sanctuary (16.2167°N, 120.0667°E)</div>
+                        </div>
+                    </div>
+                    <div class="event-meta">
+                        <div class="meta-item">
+                            <div class="meta-label">Date</div>
+                            <div class="meta-value">Jan 12, 2025</div>
+                        </div>
+                        <div class="meta-item">
+                            <div class="meta-label">Participants</div>
+                            <div class="meta-value">18 / 25</div>
+                        </div>
+                        <div class="meta-item">
+                            <div class="meta-label">Duration</div>
+                            <div class="meta-value">7 hours</div>
+                        </div>
+                        <div class="meta-item">
+                            <div class="meta-label">SBT Reward</div>
+                            <div class="meta-value">28 tokens</div>
+                        </div>
+                    </div>
+                    <div class="event-description">
+                        Underwater seagrass planting in Infanta's coastal waters. Learn about seagrass ecology, carbon sequestration benefits, and transplantation techniques in this municipality known for its pristine marine environment.
+                    </div>
+                    <div class="event-actions">
+                        <button class="btn btn-primary" onclick="joinEvent(10)">
+                            Join Event
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M5 12h14M12 5l7 7-7 7"/>
+                            </svg>
+                        </button>
+                        <button class="btn btn-secondary">Share</button>
+                    </div>
+                </div>
+
+                <div class="event-card" id="event-11">
+                    <div class="event-header">
+                        <div class="event-icon">🐢</div>
+                        <div class="event-info">
+                            <h3>Dasol Turtle Monitoring</h3>
+                            <div class="event-location">📍 Dasol Nesting Beach (16.2167°N, 119.8833°E)</div>
+                        </div>
+                    </div>
+                    <div class="event-meta">
+                        <div class="meta-item">
+                            <div class="meta-label">Date</div>
+                            <div class="meta-value">Jan 15, 2025</div>
+                        </div>
+                        <div class="meta-item">
+                            <div class="meta-label">Participants</div>
+                            <div class="meta-value">12 / 20</div>
+                        </div>
+                        <div class="meta-item">
+                            <div class="meta-label">Duration</div>
+                            <div class="meta-value">8 hours</div>
+                        </div>
+                        <div class="meta-item">
+                            <div class="meta-label">SBT Reward</div>
+                            <div class="meta-value">35 tokens</div>
+                        </div>
+                    </div>
+                    <div class="event-description">
+                        Night patrol in Dasol to monitor sea turtle nesting activities. This northwestern coastal municipality is a critical nesting site - help record data, protect nests, and assist with hatchling releases.
+                    </div>
+                    <div class="event-actions">
+                        <button class="btn btn-primary" onclick="joinEvent(11)">
+                            Join Event
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M5 12h14M12 5l7 7-7 7"/>
+                            </svg>
+                        </button>
+                        <button class="btn btn-secondary">Share</button>
+                    </div>
+                </div>
+
+                <div class="event-card" id="event-12">
+                    <div class="event-header">
+                        <div class="event-icon">🎓</div>
+                        <div class="event-info">
+                            <h3>Agno Youth Marine Education</h3>
+                            <div class="event-location">📍 Agno High School (15.8833°N, 120.0167°E)</div>
+                        </div>
+                    </div>
+                    <div class="event-meta">
+                        <div class="meta-item">
+                            <div class="meta-label">Date</div>
+                            <div class="meta-value">Jan 18, 2025</div>
+                        </div>
+                        <div class="meta-item">
+                            <div class="meta-label">Participants</div>
+                            <div class="meta-value">55 / 80</div>
+                        </div>
+                        <div class="meta-item">
+                            <div class="meta-label">Duration</div>
+                            <div class="meta-value">4 hours</div>
+                        </div>
+                        <div class="meta-item">
+                            <div class="meta-label">SBT Reward</div>
+                            <div class="meta-value">8 tokens</div>
+                        </div>
+                    </div>
+                    <div class="event-description">
+                        Interactive educational program for Agno high school students. This river delta municipality faces unique coastal challenges - teach marine science, climate change impacts, and conservation careers.
+                    </div>
+                    <div class="event-actions">
+                        <button class="btn btn-primary" onclick="joinEvent(12)">
+                            Join Event
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M5 12h14M12 5l7 7-7 7"/>
+                            </svg>
+                        </button>
+                        <button class="btn btn-secondary">Share</button>
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+    </div>
+
+    <!-- Leaflet JavaScript -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    
+    <!-- Leaflet MarkerCluster JavaScript -->
+    <script src="https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js"></script>
+
+    <script>
+        // Event data with real GPS coordinates
+        const events = {
+            1: { 
+                type: 'cleanup', 
+                participants: 45, 
+                coords: [16.0194, 120.2298],
+                title: 'Lingayen Beach Cleanup',
+                location: 'Lingayen Gulf, Pangasinan',
+                date: 'Dec 15, 2024',
+                duration: '4 hours',
+                reward: '15 tokens',
+                icon: '🧹'
+            },
+            2: { 
+                type: 'restoration', 
+                participants: 12, 
+                coords: [16.1572, 119.9908],
+                title: 'Alaminos Coral Restoration',
+                location: 'Alaminos Marine Sanctuary',
+                date: 'Dec 18, 2024',
+                duration: '6 hours',
+                reward: '25 tokens',
+                icon: '🪸'
+            },
+            3: { 
+                type: 'monitoring', 
+                participants: 8, 
+                coords: [16.1943, 119.9344],
+                title: 'Hundred Islands Marine Monitoring',
+                location: 'Hundred Islands National Park',
+                date: 'Dec 20, 2024',
+                duration: '8 hours',
+                reward: '30 tokens',
+                icon: '🔬'
+            },
+            4: { 
+                type: 'education', 
+                participants: 35, 
+                coords: [15.9759, 120.3370],
+                title: 'Dagupan Conservation Workshop',
+                location: 'Dagupan Community Center',
+                date: 'Dec 22, 2024',
+                duration: '3 hours',
+                reward: '10 tokens',
+                icon: '📚'
+            },
+            5: { 
+                type: 'cleanup', 
+                participants: 28, 
+                coords: [16.3831, 119.8867],
+                title: 'Bolinao Mangrove Restoration',
+                location: 'Bolinao Peninsula',
+                date: 'Dec 25, 2024',
+                duration: '5 hours',
+                reward: '20 tokens',
+                icon: '🌿'
+            },
+            6: { 
+                type: 'restoration', 
+                participants: 15, 
+                coords: [15.9315, 120.3417],
+                title: 'San Carlos Reef Survey',
+                location: 'San Carlos Marine Reserve',
+                date: 'Dec 28, 2024',
+                duration: '6 hours',
+                reward: '25 tokens',
+                icon: '🐠'
+            },
+            7: { 
+                type: 'monitoring', 
+                participants: 20, 
+                coords: [16.2642, 119.9908],
+                title: 'Anda Water Quality Assessment',
+                location: 'Anda Coastal Waters',
+                date: 'Jan 2, 2025',
+                duration: '4 hours',
+                reward: '18 tokens',
+                icon: '💧'
+            },
+            8: { 
+                type: 'education', 
+                participants: 42, 
+                coords: [16.1936, 119.8344],
+                title: 'Bani Community Outreach',
+                location: 'Bani Municipal Hall',
+                date: 'Jan 5, 2025',
+                duration: '6 hours',
+                reward: '12 tokens',
+                icon: '👥'
+            },
+            9: { 
+                type: 'cleanup', 
+                participants: 38, 
+                coords: [15.8789, 120.1167],
+                title: 'Labrador Beach Cleanup',
+                location: 'Labrador Beach',
+                date: 'Jan 8, 2025',
+                duration: '5 hours',
+                reward: '16 tokens',
+                icon: '🏖️'
+            },
+            10: { 
+                type: 'restoration', 
+                participants: 18, 
+                coords: [16.2167, 120.0667],
+                title: 'Infanta Seagrass Restoration',
+                location: 'Infanta Marine Sanctuary',
+                date: 'Jan 12, 2025',
+                duration: '7 hours',
+                reward: '28 tokens',
+                icon: '🌱'
+            },
+            11: { 
+                type: 'monitoring', 
+                participants: 12, 
+                coords: [16.2167, 119.8833],
+                title: 'Dasol Turtle Monitoring',
+                location: 'Dasol Nesting Beach',
+                date: 'Jan 15, 2025',
+                duration: '8 hours',
+                reward: '35 tokens',
+                icon: '🐢'
+            },
+            12: { 
+                type: 'education', 
+                participants: 55, 
+                coords: [15.8833, 120.0167],
+                title: 'Agno Youth Marine Education',
+                location: 'Agno High School',
+                date: 'Jan 18, 2025',
+                duration: '4 hours',
+                reward: '8 tokens',
+                icon: '🎓'
+            }
+        };
+
+        // Initialize map
+        let map;
+        let markers = {};
+        let markerClusterGroup;
+        let currentFilter = 'all';
+        let satelliteLayer;
+        let osmLayer;
+
+        function initMap() {
+            // Create map centered on Pangasinan
+            map = L.map('map').setView([16.0769, 120.0], 10);
+
+            // OpenStreetMap layer
+            osmLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap contributors',
+                maxZoom: 19
+            }).addTo(map);
+
+            // Satellite layer (using Esri World Imagery)
+            satelliteLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+                attribution: 'Tiles © Esri — Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community',
+                maxZoom: 19
+            });
+
+            // Initialize marker cluster group
+            markerClusterGroup = L.markerClusterGroup({
+                maxClusterRadius: 50,
+                spiderfyOnMaxZoom: true,
+                showCoverageOnHover: false,
+                zoomToBoundsOnClick: true
+            });
+
+            // Add markers for all events
+            addEventMarkers();
+
+            // Add cluster group to map
+            map.addLayer(markerClusterGroup);
+
+            // Add event listeners
+            setupEventListeners();
+
+            // Update stats
+            updateStats();
+        }
+
+        function addEventMarkers() {
+            Object.keys(events).forEach(eventId => {
+                const event = events[eventId];
+                
+                // Create custom marker HTML
+                const markerHtml = `
+                    <div class="custom-marker marker-${event.type}" data-event="${eventId}">
+                        ${event.icon}
+                    </div>
+                `;
+
+                // Create custom icon
+                const customIcon = L.divIcon({
+                    html: markerHtml,
+                    className: 'custom-div-icon',
+                    iconSize: [45, 45],
+                    iconAnchor: [22.5, 22.5],
+                    popupAnchor: [0, -22.5]
+                });
+
+                // Create marker
+                const marker = L.marker(event.coords, { icon: customIcon });
+
+                // Create popup content
+                const popupContent = `
+                    <div class="popup-header">
+                        <div class="popup-icon marker-${event.type}">${event.icon}</div>
+                        <div>
+                            <h4 class="popup-title">${event.title}</h4>
+                            <p class="popup-location">📍 ${event.location}</p>
+                        </div>
+                    </div>
+                    <div class="popup-meta">
+                        <div class="popup-meta-item">
+                            <div class="popup-meta-label">Date</div>
+                            <div class="popup-meta-value">${event.date}</div>
+                        </div>
+                        <div class="popup-meta-item">
+                            <div class="popup-meta-label">Participants</div>
+                            <div class="popup-meta-value">${event.participants}</div>
+                        </div>
+                        <div class="popup-meta-item">
+                            <div class="popup-meta-label">Duration</div>
+                            <div class="popup-meta-value">${event.duration}</div>
+                        </div>
+                        <div class="popup-meta-item">
+                            <div class="popup-meta-label">SBT Reward</div>
+                            <div class="popup-meta-value">${event.reward}</div>
+                        </div>
+                    </div>
+                    <button class="popup-btn" onclick="showEventDetails(${eventId})">View Details</button>
+                `;
+
+                marker.bindPopup(popupContent, {
+                    maxWidth: 300,
+                    className: 'custom-popup'
+                });
+
+                // Add click event to marker
+                marker.on('click', function() {
+                    showEventDetails(eventId);
+                    setActiveMarker(eventId);
+                });
+
+                // Store marker reference
+                markers[eventId] = marker;
+
+                // Add to cluster group
+                markerClusterGroup.addLayer(marker);
+            });
+        }
+
+        function setupEventListeners() {
+            // Filter buttons
+            const filterBtns = document.querySelectorAll('.filter-btn');
+            filterBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const filter = btn.getAttribute('data-filter');
+                    setActiveFilter(btn);
+                    filterEvents(filter);
+                });
+            });
+        }
+
+        function showEventDetails(eventId) {
+            // Hide placeholder
+            const placeholder = document.getElementById('eventPlaceholder');
+            if (placeholder) {
+                placeholder.style.display = 'none';
+            }
+            
+            // Hide all event cards
+            document.querySelectorAll('.event-card').forEach(card => {
+                card.classList.remove('active');
+            });
+
+            // Show selected event card
+            const selectedCard = document.getElementById(`event-${eventId}`);
+            if (selectedCard) {
+                selectedCard.classList.add('active');
+                
+                // Smooth scroll to the event details section on mobile
+                if (window.innerWidth <= 1024) {
+                    selectedCard.scrollIntoView({ 
+                        behavior: 'smooth', 
+                        block: 'nearest' 
+                    });
+                }
+                
+                // Add a subtle highlight effect
+                selectedCard.style.transform = 'scale(1.02)';
+                setTimeout(() => {
+                    selectedCard.style.transform = 'scale(1)';
+                }, 300);
+                
+                console.log(`Event ${eventId} details displayed successfully`);
+            } else {
+                console.error(`Event card with ID event-${eventId} not found`);
+            }
+        }
+
+        function setActiveMarker(eventId) {
+            // Remove active class from all markers
+            document.querySelectorAll('.custom-marker').forEach(marker => {
+                marker.classList.remove('active');
+            });
+
+            // Add active class to selected marker
+            const activeMarker = document.querySelector(`[data-event="${eventId}"]`);
+            if (activeMarker) {
+                activeMarker.classList.add('active');
+            }
+        }
+
+        function setActiveFilter(activeBtn) {
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            activeBtn.classList.add('active');
+        }
+
+        function filterEvents(filter) {
+            currentFilter = filter;
+            
+            // Clear existing markers from cluster group
+            markerClusterGroup.clearLayers();
+
+            // Add filtered markers
+            Object.keys(events).forEach(eventId => {
+                const event = events[eventId];
+                if (filter === 'all' || event.type === filter) {
+                    markerClusterGroup.addLayer(markers[eventId]);
+                }
+            });
+
+            // Reset active states
+            document.querySelectorAll('.custom-marker').forEach(marker => {
+                marker.classList.remove('active');
+            });
+            
+            // Hide event details and show placeholder
+            document.querySelectorAll('.event-card').forEach(card => {
+                card.classList.remove('active');
+            });
+            document.getElementById('eventPlaceholder').style.display = 'block';
+
+            // Update stats based on filter
+            updateStats(filter);
+        }
+
+        function updateStats(filter = 'all') {
+            let totalEvents = 0;
+            let totalParticipants = 0;
+
+            Object.keys(events).forEach(eventId => {
+                const event = events[eventId];
+                if (filter === 'all' || event.type === filter) {
+                    totalEvents++;
+                    totalParticipants += event.participants;
+                }
+            });
+
+            // Animate counter updates
+            animateCounter('totalEvents', totalEvents);
+            animateCounter('totalParticipants', totalParticipants);
+        }
+
+        function animateCounter(elementId, target) {
+            const element = document.getElementById(elementId);
+            const start = parseInt(element.textContent) || 0;
+            const duration = 1000;
+            const startTime = performance.now();
+
+            function updateCounter(currentTime) {
+                const elapsed = currentTime - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                const current = Math.floor(start + (target - start) * progress);
+                element.textContent = current;
+                if (progress < 1) requestAnimationFrame(updateCounter);
+            }
+            requestAnimationFrame(updateCounter);
+        }
+
+        // Map control functions
+        function centerOnPangasinan() {
+            map.setView([16.0769, 120.0], 10);
+        }
+
+        function showAllEvents() {
+            // Reset filter to show all events
+            document.querySelector('[data-filter="all"]').click();
+            
+            // Fit map to show all markers
+            if (markerClusterGroup.getLayers().length > 0) {
+                map.fitBounds(markerClusterGroup.getBounds(), { padding: [20, 20] });
+            }
+        }
+
+        function toggleSatellite() {
+            if (map.hasLayer(satelliteLayer)) {
+                map.removeLayer(satelliteLayer);
+                map.addLayer(osmLayer);
+            } else {
+                map.removeLayer(osmLayer);
+                map.addLayer(satelliteLayer);
+            }
+        }
+
+        // Return to welcome page
+        function returnToWelcome() {
+            const returnBtn = document.querySelector('.return-btn');
+            const originalContent = returnBtn.innerHTML;
+            
+            returnBtn.innerHTML = `<div class="loading"></div> Returning...`;
+
+            setTimeout(() => {
+                window.location.href ='dashboard.html'
+                returnBtn.innerHTML = originalContent;
+            }, 1500);
+        }
+
+        // Join event functionality
+        function joinEvent(eventId) {
+            const btn = event.target;
+            const originalContent = btn.innerHTML;
+            
+            btn.innerHTML = `<div class="loading"></div> Joining...`;
+
+            setTimeout(() => {
+                alert('Successfully joined the event!\n\nYou will receive a confirmation email with event details and location information.');
+                btn.innerHTML = `
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M20 6L9 17l-5-5"/>
+                    </svg>
+                    Joined!
+                `;
+                btn.style.background = 'var(--accent-wave)';
+            }, 2000);
+        }
+
+        // Initialize map when page loads
+        document.addEventListener('DOMContentLoaded', initMap);
+
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            if (map) {
+                map.invalidateSize();
+            }
+        });
+    </script>
+</body>
+</html>

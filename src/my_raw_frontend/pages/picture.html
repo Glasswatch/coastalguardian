@@ -1,0 +1,1279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coastal Guardian | Document Marine Wildlife</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    
+    <style>
+        :root {
+            --primary-ocean: #0B4D68;
+            --deep-sea: #1B5E7A;
+            --ocean-blue: #2E86AB;
+            --sea-foam: #A8DADC;
+            --coral-reef: #F1FAEE;
+            --wave-crest: #E9F7F7;
+            --seafoam-green: #457B9D;
+            --tidal-pool: #1D3557;
+            --white: #FFFFFF;
+            --dark-text: #1D3557;
+            --medium-text: #457B9D;
+            --light-text: #2E86AB;
+            --warning: #F77F00;
+            --danger: #E63946;
+            --gradient-primary: linear-gradient(135deg, #1D3557 0%, #0B4D68 50%, #2E86AB 100%);
+            --gradient-secondary: linear-gradient(135deg, #A8DADC 0%, #F1FAEE 50%, #E9F7F7 100%);
+            --gradient-accent: linear-gradient(135deg, #457B9D 0%, #2E86AB 100%);
+            --gradient-ocean: linear-gradient(135deg, #0B4D68 0%, #1B5E7A 50%, #2E86AB 100%);
+            --gradient-wave: linear-gradient(135deg, #A8DADC 0%, #F1FAEE 100%);
+            --shadow-soft: 0 4px 20px rgba(29, 53, 87, 0.1);
+            --shadow-medium: 0 8px 30px rgba(29, 53, 87, 0.15);
+            --shadow-strong: 0 15px 40px rgba(29, 53, 87, 0.2);
+            --background: linear-gradient(135deg, #F1FAEE 0%, #E9F7F7 100%);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--background);
+            color: var(--dark-text);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* Navigation */
+        .navbar {
+            background: var(--gradient-ocean);
+            color: white;
+            padding: 1rem 0;
+            position: relative;
+            overflow: hidden;
+            box-shadow: var(--shadow-medium);
+        }
+
+        .navbar::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 20"><path d="M0,10 Q25,0 50,10 T100,10 V20 H0 Z" fill="rgba(255,255,255,0.1)"/></svg>');
+            background-size: 200px 20px;
+            animation: wave 8s ease-in-out infinite;
+        }
+
+        @keyframes wave {
+            0%, 100% { transform: translateX(0); }
+            50% { transform: translateX(-100px); }
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+            z-index: 2;
+        }
+
+        .logo {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: white;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .logo::before {
+            content: '🌊';
+            font-size: 1.8rem;
+        }
+
+        .return-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            cursor: pointer;
+        }
+
+        .return-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-medium);
+        }
+
+        /* Header Section */
+        .header-section {
+            padding: 4rem 0 2rem;
+            text-align: center;
+            background: var(--gradient-primary);
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 20"><path d="M0,10 Q25,0 50,10 T100,10 V20 H0 Z" fill="rgba(255,255,255,0.05)"/></svg>');
+            background-size: 200px 20px;
+            animation: wave 10s ease-in-out infinite reverse;
+        }
+
+        .floating-creatures {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: 1;
+        }
+
+        .creature {
+            position: absolute;
+            opacity: 0.3;
+            animation: float 15s ease-in-out infinite;
+        }
+
+        .creature:nth-child(1) {
+            top: 20%;
+            left: 10%;
+            font-size: 3rem;
+            animation-delay: 0s;
+        }
+
+        .creature:nth-child(2) {
+            top: 60%;
+            right: 15%;
+            font-size: 2.5rem;
+            animation-delay: 3s;
+        }
+
+        .creature:nth-child(3) {
+            top: 30%;
+            right: 30%;
+            font-size: 2rem;
+            animation-delay: 6s;
+        }
+
+        .creature:nth-child(4) {
+            bottom: 20%;
+            left: 25%;
+            font-size: 2.2rem;
+            animation-delay: 9s;
+        }
+
+        .creature:nth-child(5) {
+            bottom: 40%;
+            right: 5%;
+            font-size: 1.8rem;
+            animation-delay: 12s;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(5deg); }
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            position: relative;
+            z-index: 2;
+        }
+
+        .page-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: clamp(2.5rem, 5vw, 4rem);
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+
+        .page-subtitle {
+            font-size: 1.2rem;
+            max-width: 800px;
+            margin: 0 auto 2rem;
+            opacity: 0.9;
+        }
+
+        .reward-badge {
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 0.75rem 1.5rem;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 2rem;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .reward-badge strong {
+            color: var(--coral-reef);
+        }
+
+        /* Form Section */
+        .form-section {
+            padding: 4rem 0;
+            background: white;
+            box-shadow: var(--shadow-soft);
+            position: relative;
+        }
+
+        .form-section::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 100px;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320"><path fill="%23F1FAEE" fill-opacity="1" d="M0,96L48,112C96,128,192,160,288,160C384,160,480,128,576,122.7C672,117,768,139,864,149.3C960,160,1056,160,1152,138.7C1248,117,1344,75,1392,53.3L1440,32L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path></svg>');
+            background-repeat: no-repeat;
+            background-position: bottom;
+            background-size: cover;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .form-container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: var(--shadow-medium);
+            position: relative;
+            z-index: 2;
+        }
+
+        .form-header {
+            background: var(--gradient-accent);
+            color: white;
+            padding: 1.5rem 2rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .form-icon {
+            font-size: 2rem;
+        }
+
+        .form-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .form-content {
+            padding: 2rem;
+        }
+
+        .form-group {
+            margin-bottom: 2rem;
+        }
+
+        .form-label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--dark-text);
+        }
+
+        .form-input,
+        .form-textarea,
+        .form-select {
+            width: 100%;
+            padding: 1rem;
+            border: 2px solid var(--sea-foam);
+            border-radius: 10px;
+            font-family: 'Inter', sans-serif;
+            font-size: 1rem;
+            color: var(--dark-text);
+            transition: all 0.3s ease;
+        }
+
+        .form-input:focus,
+        .form-textarea:focus,
+        .form-select:focus {
+            outline: none;
+            border-color: var(--ocean-blue);
+            box-shadow: var(--shadow-soft);
+        }
+
+        .form-textarea {
+            min-height: 150px;
+            resize: vertical;
+        }
+
+        .form-select {
+            appearance: none;
+            background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="%232E86AB" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>');
+            background-repeat: no-repeat;
+            background-position: right 1rem center;
+            background-size: 1.2rem;
+        }
+
+        .form-help {
+            font-size: 0.85rem;
+            color: var(--medium-text);
+            margin-top: 0.5rem;
+        }
+
+        .species-input-container {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .species-input-container .form-select {
+            flex: 2;
+        }
+
+        .species-input-container .form-input {
+            flex: 3;
+        }
+
+        /* Date and Time Inputs */
+        .datetime-container {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .datetime-container .form-group {
+            flex: 1;
+            margin-bottom: 0;
+        }
+
+        /* Map Container */
+        .map-container {
+            height: 300px;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 1rem;
+            border: 2px solid var(--sea-foam);
+        }
+
+        #map {
+            height: 100%;
+            width: 100%;
+        }
+
+        .coordinates-display {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .coordinate-input {
+            flex: 1;
+        }
+
+        /* File Upload */
+        .file-upload {
+            border: 2px dashed var(--sea-foam);
+            border-radius: 10px;
+            padding: 2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .file-upload:hover {
+            border-color: var(--ocean-blue);
+            background: var(--wave-crest);
+        }
+
+        .file-upload-icon {
+            font-size: 2.5rem;
+            color: var(--ocean-blue);
+            margin-bottom: 1rem;
+        }
+
+        .file-upload-text {
+            font-weight: 600;
+            color: var(--dark-text);
+            margin-bottom: 0.5rem;
+        }
+
+        .file-upload-subtext {
+            font-size: 0.85rem;
+            color: var(--medium-text);
+        }
+
+        .file-upload input[type="file"] {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .file-preview {
+            display: none;
+            margin-top: 1.5rem;
+        }
+
+        .file-preview.active {
+            display: block;
+        }
+
+        .preview-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .preview-item {
+            position: relative;
+            border-radius: 8px;
+            overflow: hidden;
+            height: 100px;
+            background: var(--sea-foam);
+        }
+
+        .preview-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .preview-item video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .preview-remove {
+            position: absolute;
+            top: 0.25rem;
+            right: 0.25rem;
+            background: rgba(0, 0, 0, 0.5);
+            color: white;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .preview-remove:hover {
+            background: var(--danger);
+        }
+
+        /* Submit Button */
+        .submit-btn {
+            background: var(--gradient-primary);
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            width: 100%;
+            margin-top: 2rem;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-medium);
+        }
+
+        /* Verification Note */
+        .verification-note {
+            background: var(--gradient-wave);
+            padding: 2rem;
+            border-radius: 15px;
+            margin-top: 3rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .verification-note::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: var(--gradient-accent);
+        }
+
+        .verification-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--dark-text);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .verification-text {
+            color: var(--medium-text);
+            margin-bottom: 1rem;
+        }
+
+        .blockchain-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: var(--gradient-accent);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-top: 1rem;
+        }
+
+        /* Species Info Box */
+        .species-info {
+            background: var(--wave-crest);
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-top: 1rem;
+            border-left: 4px solid var(--ocean-blue);
+            display: none;
+        }
+
+        .species-info.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .species-info-title {
+            font-weight: 600;
+            color: var(--dark-text);
+            margin-bottom: 0.5rem;
+        }
+
+        .species-info-text {
+            font-size: 0.9rem;
+            color: var(--medium-text);
+        }
+
+        /* Loading State */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Success Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            backdrop-filter: blur(5px);
+        }
+
+        .modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 3rem;
+            border-radius: 20px;
+            max-width: 500px;
+            width: 90%;
+            text-align: center;
+            box-shadow: var(--shadow-strong);
+            position: relative;
+        }
+
+        .modal-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+        }
+
+        .modal-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--dark-text);
+            margin-bottom: 1rem;
+        }
+
+        .modal-text {
+            color: var(--medium-text);
+            margin-bottom: 2rem;
+        }
+
+        .modal-btn {
+            background: var(--gradient-accent);
+            color: white;
+            border: none;
+            padding: 0.75rem 2rem;
+            border-radius: 50px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .modal-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-soft);
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--medium-text);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .nav-container {
+                flex-direction: column;
+                gap: 1rem;
+                text-align: center;
+            }
+
+            .species-input-container,
+            .datetime-container,
+            .coordinates-display {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .form-content {
+                padding: 1.5rem;
+            }
+
+            .verification-note {
+                padding: 1.5rem;
+            }
+
+            .modal-content {
+                padding: 2rem;
+                margin: 1rem;
+            }
+        }
+
+        /* Animations */
+        .fade-in {
+            opacity: 0;
+            transform: translateY(30px);
+            animation: fadeInUp 0.8s ease forwards;
+        }
+
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .slide-in {
+            opacity: 0;
+            transform: translateX(-30px);
+            animation: slideIn 0.8s ease forwards;
+        }
+
+        @keyframes slideIn {
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="#" class="logo">Coastal Guardian</a>
+            <button class="return-btn" onclick="returnToWelcome()">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M19 12H5M12 19l-7-7 7-7"/>
+                </svg>
+                Return to Dashboard
+            </button>
+        </div>
+    </nav>
+
+    <!-- Header Section -->
+    <section class="header-section">
+        <div class="floating-creatures">
+            <div class="creature">🐬</div>
+            <div class="creature">🐠</div>
+            <div class="creature">🐙</div>
+            <div class="creature">🦑</div>
+            <div class="creature">🐡</div>
+        </div>
+        <div class="container">
+            <h1 class="page-title fade-in">Document Marine Wildlife</h1>
+            <p class="page-subtitle fade-in">
+                Help marine researchers track biodiversity by documenting wildlife sightings. Your observations contribute to vital conservation research and ecosystem monitoring.
+            </p>
+            <div class="reward-badge fade-in">
+                <span>🪙 Earn <strong>+30 CGT</strong> for each verified wildlife sighting</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- Form Section -->
+    <section class="form-section">
+        <div class="container">
+            <div class="form-container fade-in">
+                <div class="form-header">
+                    <div class="form-icon">🐋</div>
+                    <h2 class="form-title">Marine Wildlife Sighting Report</h2>
+                </div>
+                <div class="form-content">
+                    <form id="wildlifeForm">
+                        <!-- Species Selection -->
+                        <div class="form-group">
+                            <label class="form-label">Species Information</label>
+                            <div class="species-input-container">
+                                <select id="speciesCategory" class="form-select" required>
+                                    <option value="" disabled selected>Select category</option>
+                                    <option value="fish">Fish</option>
+                                    <option value="mammal">Marine Mammal</option>
+                                    <option value="reptile">Marine Reptile</option>
+                                    <option value="bird">Seabird</option>
+                                    <option value="invertebrate">Invertebrate</option>
+                                    <option value="coral">Coral</option>
+                                    <option value="other">Other</option>
+                                </select>
+                                <input type="text" id="speciesName" class="form-input" placeholder="Species name (if known)" required>
+                            </div>
+                            <p class="form-help">Select a category and enter the species name if known, or describe it</p>
+                            
+                            <!-- Species Info Box (shows when certain species are selected) -->
+                            <div class="species-info" id="speciesInfo">
+                                <h4 class="species-info-title">Species Information</h4>
+                                <p class="species-info-text" id="speciesInfoText">
+                                    Select a common species to see more information.
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- Date and Time -->
+                        <div class="form-group">
+                            <label class="form-label">Date and Time of Sighting</label>
+                            <div class="datetime-container">
+                                <div class="form-group">
+                                    <label class="form-label" for="sightingDate">Date</label>
+                                    <input type="date" id="sightingDate" class="form-input" required>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label" for="sightingTime">Time</label>
+                                    <input type="time" id="sightingTime" class="form-input" required>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Location Selection -->
+                        <div class="form-group">
+                            <label class="form-label">Location of Sighting</label>
+                            <div class="map-container">
+                                <div id="map"></div>
+                            </div>
+                            <div class="coordinates-display">
+                                <div class="coordinate-input">
+                                    <label class="form-label">Latitude</label>
+                                    <input type="text" id="latitude" class="form-input" placeholder="e.g. 16.0194" required>
+                                </div>
+                                <div class="coordinate-input">
+                                    <label class="form-label">Longitude</label>
+                                    <input type="text" id="longitude" class="form-input" placeholder="e.g. 120.2298" required>
+                                </div>
+                            </div>
+                            <p class="form-help">Click on the map to set the location or enter coordinates manually</p>
+                        </div>
+
+                        <!-- Description -->
+                        <div class="form-group">
+                            <label class="form-label" for="description">Behavior Observed</label>
+                            <textarea id="description" class="form-textarea" placeholder="Describe what the marine life was doing, how many you saw, and any notable behaviors..." required></textarea>
+                            <p class="form-help">Include details about behavior, estimated size, quantity, and any interactions observed</p>
+                        </div>
+
+                        <!-- File Upload -->
+                        <div class="form-group">
+                            <label class="form-label">Photo/Video Evidence</label>
+                            <div class="file-upload">
+                                <div class="file-upload-icon">📷</div>
+                                <div class="file-upload-text">Drag & drop files or click to browse</div>
+                                <div class="file-upload-subtext">Upload photos or videos of the marine life (max 5 files, 10MB each)</div>
+                                <input type="file" id="fileUpload" multiple accept="image/*,video/*">
+                            </div>
+                            <div class="file-preview" id="filePreview">
+                                <div class="preview-grid" id="previewGrid"></div>
+                            </div>
+                        </div>
+
+                        <!-- Wallet Address -->
+                        <div class="form-group">
+                            <label class="form-label" for="walletAddress">Wallet Address for Rewards</label>
+                            <input type="text" id="walletAddress" class="form-input" placeholder="0x..." required>
+                            <p class="form-help">Enter your Web3 wallet address to receive CGT tokens upon verification</p>
+                        </div>
+
+                        <!-- Submit Button -->
+                        <button type="submit" class="submit-btn" id="submitBtn">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/>
+                            </svg>
+                            Submit Wildlife Sighting
+                        </button>
+                    </form>
+
+                    <!-- Verification Note -->
+                    <div class="verification-note">
+                        <h3 class="verification-title">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                                <polyline points="22 4 12 14.01 9 11.01"/>
+                            </svg>
+                            Verification Process
+                        </h3>
+                        <p class="verification-text">
+                            All submitted wildlife sightings are reviewed by marine biologists to verify species identification and documentation accuracy. Verified sightings earn 30 CGT tokens as a reward for your contribution to marine research.
+                        </p>
+                        <p class="verification-text">
+                            Your data helps researchers track migration patterns, population health, and biodiversity changes in our coastal ecosystems. This information is vital for conservation efforts and policy decisions.
+                        </p>
+                        <div class="blockchain-badge">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="2" y="7" width="20" height="14" rx="2" ry="2"/>
+                                <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>
+                            </svg>
+                            Permanently Recorded On-Chain
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Success Modal -->
+    <div class="modal" id="successModal">
+        <div class="modal-content">
+            <button class="close-modal" onclick="closeModal()">&times;</button>
+            <div class="modal-icon">🎉</div>
+            <h3 class="modal-title">Sighting Submitted Successfully!</h3>
+            <p class="modal-text">
+                Thank you for contributing to marine conservation research! Your wildlife sighting has been submitted and will be reviewed by our marine biologists. Upon verification, 30 CGT tokens will be transferred to your wallet.
+            </p>
+            <button class="modal-btn" onclick="closeModal()">
+                Continue
+            </button>
+        </div>
+    </div>
+
+    <!-- Leaflet JavaScript -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <script>
+        // Initialize map
+        let map;
+        let marker;
+        let selectedLocation = { lat: 16.0194, lng: 120.2298 }; // Default location (Pangasinan)
+
+        // Species information database
+        const speciesInfo = {
+            "whale shark": {
+                category: "fish",
+                info: "The whale shark (Rhincodon typus) is the largest fish species, feeding primarily on plankton. These gentle giants are endangered and sightings help track their migration patterns."
+            },
+            "dugong": {
+                category: "mammal",
+                info: "Dugongs (Dugong dugon) are marine mammals that feed on seagrass. They are vulnerable to extinction and your sighting is extremely valuable for conservation efforts."
+            },
+            "hawksbill turtle": {
+                category: "reptile",
+                info: "The hawksbill sea turtle (Eretmochelys imbricata) is critically endangered. They play a key role in maintaining coral reef ecosystems by controlling sponge populations."
+            },
+            "green turtle": {
+                category: "reptile",
+                info: "Green sea turtles (Chelonia mydas) are endangered and crucial for maintaining seagrass bed health. Your sighting helps track their population recovery."
+            },
+            "manta ray": {
+                category: "fish",
+                info: "Manta rays (Mobula birostris) are filter feeders that help regulate plankton populations. They are vulnerable to extinction and sightings help establish protection zones."
+            },
+            "dolphin": {
+                category: "mammal",
+                info: "Dolphins are intelligent marine mammals that play important roles in oceanic ecosystems. Your sighting helps track pod movements and health."
+            }
+        };
+
+        document.addEventListener('DOMContentLoaded', function() {
+            initMap();
+            setupEventListeners();
+            setDefaultDate();
+            
+            // Add animation delays
+            const elements = document.querySelectorAll('.fade-in, .slide-in');
+            elements.forEach((el, index) => {
+                el.style.animationDelay = `${index * 0.1}s`;
+            });
+        });
+
+        function initMap() {
+            // Create map centered on default location
+            map = L.map('map').setView([selectedLocation.lat, selectedLocation.lng], 10);
+
+            // Add OpenStreetMap layer
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap contributors',
+                maxZoom: 19
+            }).addTo(map);
+
+            // Add initial marker
+            marker = L.marker([selectedLocation.lat, selectedLocation.lng], {
+                draggable: true
+            }).addTo(map);
+
+            // Update coordinates when marker is dragged
+            marker.on('dragend', function(e) {
+                const position = marker.getLatLng();
+                selectedLocation = { lat: position.lat, lng: position.lng };
+                updateCoordinateInputs();
+            });
+
+            // Add click event to map
+            map.on('click', function(e) {
+                selectedLocation = { lat: e.latlng.lat, lng: e.latlng.lng };
+                marker.setLatLng(e.latlng);
+                updateCoordinateInputs();
+            });
+
+            // Update coordinate inputs with initial values
+            updateCoordinateInputs();
+        }
+
+        function updateCoordinateInputs() {
+            document.getElementById('latitude').value = selectedLocation.lat.toFixed(6);
+            document.getElementById('longitude').value = selectedLocation.lng.toFixed(6);
+        }
+
+        function setDefaultDate() {
+            // Set today's date as default
+            const today = new Date();
+            const formattedDate = today.toISOString().split('T')[0];
+            document.getElementById('sightingDate').value = formattedDate;
+            
+            // Set current time as default
+            const hours = String(today.getHours()).padStart(2, '0');
+            const minutes = String(today.getMinutes()).padStart(2, '0');
+            document.getElementById('sightingTime').value = `${hours}:${minutes}`;
+        }
+
+        function setupEventListeners() {
+            // Coordinate input changes
+            document.getElementById('latitude').addEventListener('change', updateMarkerFromInputs);
+            document.getElementById('longitude').addEventListener('change', updateMarkerFromInputs);
+
+            // File upload handling
+            document.getElementById('fileUpload').addEventListener('change', handleFileUpload);
+
+            // Form submission
+            document.getElementById('wildlifeForm').addEventListener('submit', handleFormSubmit);
+            
+            // Species name input for showing info
+            document.getElementById('speciesName').addEventListener('input', checkSpeciesInfo);
+            
+            // Species category change
+            document.getElementById('speciesCategory').addEventListener('change', function() {
+                // Suggest common species based on category
+                const category = this.value;
+                const speciesInput = document.getElementById('speciesName');
+                let placeholder = "Species name (if known)";
+                
+                switch(category) {
+                    case 'fish':
+                        placeholder = "E.g. Whale Shark, Manta Ray, Tuna";
+                        break;
+                    case 'mammal':
+                        placeholder = "E.g. Dolphin, Dugong, Whale";
+                        break;
+                    case 'reptile':
+                        placeholder = "E.g. Green Turtle, Hawksbill Turtle";
+                        break;
+                    case 'bird':
+                        placeholder = "E.g. Frigatebird, Pelican, Tern";
+                        break;
+                    case 'invertebrate':
+                        placeholder = "E.g. Giant Clam, Octopus, Jellyfish";
+                        break;
+                    case 'coral':
+                        placeholder = "E.g. Brain Coral, Staghorn Coral";
+                        break;
+                }
+                
+                speciesInput.placeholder = placeholder;
+                checkSpeciesInfo();
+            });
+        }
+
+        function checkSpeciesInfo() {
+            const speciesName = document.getElementById('speciesName').value.toLowerCase();
+            const speciesInfoBox = document.getElementById('speciesInfo');
+            const speciesInfoText = document.getElementById('speciesInfoText');
+            
+            // Check if we have info about this species
+            for (const [key, data] of Object.entries(speciesInfo)) {
+                if (speciesName.includes(key)) {
+                    speciesInfoBox.classList.add('active');
+                    speciesInfoText.textContent = data.info;
+                    
+                    // Auto-select the correct category if it's not already selected
+                    const categorySelect = document.getElementById('speciesCategory');
+                    if (categorySelect.value !== data.category) {
+                        categorySelect.value = data.category;
+                    }
+                    
+                    return;
+                }
+            }
+            
+            // If no match found, hide the info box
+            speciesInfoBox.classList.remove('active');
+        }
+
+        function updateMarkerFromInputs() {
+            const lat = parseFloat(document.getElementById('latitude').value);
+            const lng = parseFloat(document.getElementById('longitude').value);
+            
+            if (!isNaN(lat) && !isNaN(lng)) {
+                selectedLocation = { lat, lng };
+                marker.setLatLng([lat, lng]);
+                map.panTo([lat, lng]);
+            }
+        }
+
+        function handleFileUpload(e) {
+            const files = e.target.files;
+            const previewGrid = document.getElementById('previewGrid');
+            const filePreview = document.getElementById('filePreview');
+            
+            // Clear previous previews
+            previewGrid.innerHTML = '';
+            
+            if (files.length > 0) {
+                filePreview.classList.add('active');
+                
+                // Limit to 5 files
+                const filesToProcess = Array.from(files).slice(0, 5);
+                
+                filesToProcess.forEach((file, index) => {
+                    const reader = new FileReader();
+                    const previewItem = document.createElement('div');
+                    previewItem.className = 'preview-item';
+                    
+                    reader.onload = function(e) {
+                        if (file.type.startsWith('image/')) {
+                            const img = document.createElement('img');
+                            img.src = e.target.result;
+                            previewItem.appendChild(img);
+                        } else if (file.type.startsWith('video/')) {
+                            const video = document.createElement('video');
+                            video.src = e.target.result;
+                            video.setAttribute('muted', 'muted');
+                            previewItem.appendChild(video);
+                        }
+                        
+                        const removeBtn = document.createElement('div');
+                        removeBtn.className = 'preview-remove';
+                        removeBtn.innerHTML = '×';
+                        removeBtn.addEventListener('click', function() {
+                            previewItem.remove();
+                            if (previewGrid.children.length === 0) {
+                                filePreview.classList.remove('active');
+                            }
+                        });
+                        
+                        previewItem.appendChild(removeBtn);
+                        previewGrid.appendChild(previewItem);
+                    };
+                    
+                    reader.readAsDataURL(file);
+                });
+            } else {
+                filePreview.classList.remove('active');
+            }
+        }
+
+        function handleFormSubmit(e) {
+            e.preventDefault();
+            
+            // Get form values
+            const speciesCategory = document.getElementById('speciesCategory').value;
+            const speciesName = document.getElementById('speciesName').value;
+            const sightingDate = document.getElementById('sightingDate').value;
+            const sightingTime = document.getElementById('sightingTime').value;
+            const description = document.getElementById('description').value;
+            const walletAddress = document.getElementById('walletAddress').value;
+            
+            // Validate wallet address format (basic check)
+            if (!walletAddress.startsWith('0x') || walletAddress.length !== 42) {
+                alert('Please enter a valid wallet address (0x followed by 40 hexadecimal characters)');
+                return;
+            }
+            
+            // Show loading state
+            const submitBtn = document.getElementById('submitBtn');
+            const originalText = submitBtn.innerHTML;
+            submitBtn.innerHTML = '<div class="loading"></div> Submitting...';
+            submitBtn.disabled = true;
+            
+            // Simulate blockchain transaction
+            setTimeout(() => {
+                // Reset button
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
+                
+                // Show success modal
+                showModal('successModal');
+                
+                // Reset form
+                document.getElementById('wildlifeForm').reset();
+                document.getElementById('previewGrid').innerHTML = '';
+                document.getElementById('filePreview').classList.remove('active');
+                document.getElementById('speciesInfo').classList.remove('active');
+                
+                // Reset map marker to default location
+                selectedLocation = { lat: 16.0194, lng: 120.2298 };
+                marker.setLatLng([selectedLocation.lat, selectedLocation.lng]);
+                map.setView([selectedLocation.lat, selectedLocation.lng], 10);
+                updateCoordinateInputs();
+                
+                // Reset date and time
+                setDefaultDate();
+                
+            }, 2000); // Simulate 2-second transaction time
+        }
+
+        function showModal(modalId) {
+            document.getElementById(modalId).classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal() {
+            document.querySelectorAll('.modal').forEach(modal => {
+                modal.classList.remove('active');
+            });
+            document.body.style.overflow = 'auto';
+        }
+
+        function returnToWelcome() {
+            // Add loading state
+            const btn = event.target;
+            const originalContent = btn.innerHTML;
+            btn.innerHTML = '<div class="loading"></div> Returning...';
+            
+            setTimeout(() => {
+                window.location.href = 'index.html'; // In a real app, this would navigate to your welcome page
+            }, 1000);
+        }
+
+        // Close modal when clicking outside
+        document.querySelectorAll('.modal').forEach(modal => {
+            modal.addEventListener('click', function(e) {
+                if (e.target === this) {
+                    closeModal();
+                }
+            });
+        });
+
+        // Keyboard navigation
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeModal();
+            }
+        });
+
+        // Intersection Observer for animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.animationPlayState = 'running';
+                }
+            });
+        }, observerOptions);
+
+        // Observe animated elements
+        document.querySelectorAll('.fade-in, .slide-in').forEach(el => {
+            el.style.animationPlayState = 'paused';
+            observer.observe(el);
+        });
+    </script>
+</body>
+</html>
